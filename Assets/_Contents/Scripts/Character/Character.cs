@@ -116,7 +116,7 @@ public class Character : MonoBehaviour , IDamageable {
         }
     }
 
-    public void Die() {
+    public virtual void Die() {
         if (isDead) return;
         isDead = true;
         Movement(Vector3.zero);
@@ -124,20 +124,9 @@ public class Character : MonoBehaviour , IDamageable {
         capsule.height = 0.2f;
         capsule.center = new Vector3(0, 0.3f, 0);
         AudioSource.PlayClipAtPoint(dieSound, transform.position);
-        var agent = GetComponent<NavMeshAgent>();
-        if (agent) {
-            agent.updatePosition = false;
-            agent.updateRotation = false;
-        }
-
-        //停止行为树
-        var bt = GetComponent<NodeCanvas.BehaviourTrees.BehaviourTreeOwner>();
-        if (bt) {
-            bt.StopBehaviour();
-        }
-        
         onDead.Invoke();
     }
+
     #endregion
 
     #region Interface

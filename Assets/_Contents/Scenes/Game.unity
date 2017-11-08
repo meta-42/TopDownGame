@@ -778,6 +778,31 @@ Transform:
   m_PrefabParentObject: {fileID: 4034011897661674, guid: 7da33c341f66a37419834ad96f86fa4d,
     type: 2}
   m_PrefabInternal: {fileID: 1918551136}
+--- !u!114 &257784888
+MonoBehaviour:
+  m_ObjectHideFlags: 2
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a686a47eee2fa44cb0a34b5d86e4d5e, type: 3}
+  m_Name: Enemy
+  m_EditorClassIdentifier: 
+  _serializedGraph: '{"version":2.6,"type":"NodeCanvas.BehaviourTrees.BehaviourTree","name":"BehaviourTree","translation":{"x":-4810.113,"y":-5310.871},"nodes":[{"dynamic":true,"_nodeColor":{"r":0.7019608,"g":1.0,"b":0.4980392,"a":1.0},"_position":{"x":5795.113,"y":5625.871},"$type":"NodeCanvas.BehaviourTrees.Selector","$id":"2"},{"_condition":{"target":{"_value":1},"maxDistance":{"_value":4.86},"viewAngle":{"_value":54.0},"$type":"NodeCanvas.Tasks.Conditions.CanSeeTarget"},"_position":{"x":5484.4,"y":5788.538},"$type":"NodeCanvas.BehaviourTrees.ConditionalEvaluator","$id":"3"},{"_action":{"executionMode":"ActionsRunInParallel","actions":[{"log":{"_value":"Stop!!  Intruder!!~"},"$type":"NodeCanvas.Tasks.Actions.DebugLogText"},{"method":{"_returnInfo":"System.Void","_baseInfo":"PlayerHUD|ShowTipsLose","_paramsInfo":""},"parameters":[],"returnValue":{},"overrideAgent":{"_value":2},"$type":"NodeCanvas.Tasks.Actions.ExecuteFunction_Multiplatform"},{"method":{"_returnInfo":"System.Void","_baseInfo":"PlayerCharacter|EndPlay","_paramsInfo":""},"parameters":[],"returnValue":{},"overrideAgent":{"_value":3},"$type":"NodeCanvas.Tasks.Actions.ExecuteFunction_Multiplatform"}],"$type":"NodeCanvas.Framework.ActionList"},"_position":{"x":5341.4,"y":5973.538},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"8"},{"_action":{"targetList":{"_value":[4,5,6,7]},"patrolMode":{"_value":"Random"},"speed":{"_value":1.5},"$type":"NodeCanvas.Tasks.Actions.Patrol"},"_position":{"x":6094.113,"y":5838.871},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"23"}],"connections":[{"_sourceNode":{"$ref":"2"},"_targetNode":{"$ref":"3"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"2"},"_targetNode":{"$ref":"23"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"3"},"_targetNode":{"$ref":"8"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"}],"primeNode":{"$ref":"2"},"localBlackboard":{"_name":"Local
+    Blackboard","_variables":{}},"derivedData":{"repeat":true,"$type":"NodeCanvas.BehaviourTrees.BehaviourTree+DerivedSerializationData"}}'
+  _objectReferences:
+  - {fileID: 0}
+  - {fileID: 190884995}
+  - {fileID: 2133003344}
+  - {fileID: 1539831747}
+  - {fileID: 209566763}
+  - {fileID: 1365928209}
+  - {fileID: 955682914}
+  - {fileID: 679389981}
+  _deserializationFailed: 0
+  repeat: 1
+  updateInterval: 0
 --- !u!1 &275801736
 GameObject:
   m_ObjectHideFlags: 0
@@ -1128,7 +1153,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 322926961}
   m_LocalRotation: {x: 0.47185796, y: 0.00015220656, z: -0.000081458486, w: 0.8816746}
-  m_LocalPosition: {x: 2.5, y: 13.35, z: -1.6700001}
+  m_LocalPosition: {x: 2.5, y: 13.35, z: -13.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 570641218}
@@ -1228,8 +1253,8 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 337294768}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 574, y: 206, z: 0}
-  m_LocalScale: {x: 1.435, y: 1.435, z: 1.435}
+  m_LocalPosition: {x: 370, y: 208, z: 0}
+  m_LocalScale: {x: 0.925, y: 0.925, z: 0.925}
   m_Children:
   - {fileID: 2133003344}
   m_Father: {fileID: 0}
@@ -3469,7 +3494,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1093832486
 Transform:
   m_ObjectHideFlags: 0
@@ -3539,7 +3564,7 @@ MonoBehaviour:
   enableAction: 0
   disableAction: 0
   versionUpdateProxyGraph: {fileID: 0}
-  _graph: {fileID: 1991683863}
+  _graph: {fileID: 257784888}
   _blackboard: {fileID: 1093832488}
 --- !u!54 &1093832490
 Rigidbody:
@@ -4028,7 +4053,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1295403151}
   m_LocalRotation: {x: 0.47185796, y: 0.00015220656, z: -0.000081458486, w: 0.8816746}
-  m_LocalPosition: {x: 2.5, y: 13.35, z: -1.6700001}
+  m_LocalPosition: {x: 2.5, y: 13.35, z: -13.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 471214353}
@@ -5485,31 +5510,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1962869347}
   m_Mesh: {fileID: 4300000, guid: 920b48bbac91d2f4dbea698ceb5e1af3, type: 3}
---- !u!114 &1991683863
-MonoBehaviour:
-  m_ObjectHideFlags: 2
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a686a47eee2fa44cb0a34b5d86e4d5e, type: 3}
-  m_Name: Enemy
-  m_EditorClassIdentifier: 
-  _serializedGraph: '{"version":2.6,"type":"NodeCanvas.BehaviourTrees.BehaviourTree","name":"BehaviourTree","translation":{"x":-4810.113,"y":-5310.871},"nodes":[{"dynamic":true,"_nodeColor":{"r":0.7019608,"g":1.0,"b":0.4980392,"a":1.0},"_position":{"x":5795.113,"y":5625.871},"$type":"NodeCanvas.BehaviourTrees.Selector","$id":"2"},{"_condition":{"target":{"_value":1},"maxDistance":{"_value":4.86},"viewAngle":{"_value":54.0},"$type":"NodeCanvas.Tasks.Conditions.CanSeeTarget"},"_position":{"x":5484.4,"y":5788.538},"$type":"NodeCanvas.BehaviourTrees.ConditionalEvaluator","$id":"3"},{"_action":{"executionMode":"ActionsRunInParallel","actions":[{"log":{"_value":"Stop!!  Intruder!!~"},"$type":"NodeCanvas.Tasks.Actions.DebugLogText"},{"method":{"_returnInfo":"System.Void","_baseInfo":"PlayerHUD|ShowTipsLose","_paramsInfo":""},"parameters":[],"returnValue":{},"overrideAgent":{"_value":2},"$type":"NodeCanvas.Tasks.Actions.ExecuteFunction_Multiplatform"},{"method":{"_returnInfo":"System.Void","_baseInfo":"PlayerCharacter|EndPlay","_paramsInfo":""},"parameters":[],"returnValue":{},"overrideAgent":{"_value":3},"$type":"NodeCanvas.Tasks.Actions.ExecuteFunction_Multiplatform"}],"$type":"NodeCanvas.Framework.ActionList"},"_position":{"x":5341.4,"y":5973.538},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"8"},{"_action":{"targetList":{"_value":[4,5,6,7]},"patrolMode":{"_value":"Random"},"speed":{"_value":1.5},"$type":"NodeCanvas.Tasks.Actions.Patrol"},"_position":{"x":6094.113,"y":5838.871},"$type":"NodeCanvas.BehaviourTrees.ActionNode","$id":"23"}],"connections":[{"_sourceNode":{"$ref":"2"},"_targetNode":{"$ref":"3"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"2"},"_targetNode":{"$ref":"23"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"},{"_sourceNode":{"$ref":"3"},"_targetNode":{"$ref":"8"},"$type":"NodeCanvas.BehaviourTrees.BTConnection"}],"primeNode":{"$ref":"2"},"localBlackboard":{"_name":"Local
-    Blackboard","_variables":{}},"derivedData":{"repeat":true,"$type":"NodeCanvas.BehaviourTrees.BehaviourTree+DerivedSerializationData"}}'
-  _objectReferences:
-  - {fileID: 0}
-  - {fileID: 190884995}
-  - {fileID: 2133003344}
-  - {fileID: 1539831747}
-  - {fileID: 209566763}
-  - {fileID: 1365928209}
-  - {fileID: 955682914}
-  - {fileID: 679389981}
-  _deserializationFailed: 0
-  repeat: 1
-  updateInterval: 0
 --- !u!1 &2016568496
 GameObject:
   m_ObjectHideFlags: 0
@@ -6000,7 +6000,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4953593939234940, guid: b657c08a0b723024f871e06d1bfa2193, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 6.63
+      value: -5.62
       objectReference: {fileID: 0}
     - target: {fileID: 4953593939234940, guid: b657c08a0b723024f871e06d1bfa2193, type: 2}
       propertyPath: m_LocalRotation.x
@@ -6026,6 +6026,11 @@ Prefab:
         type: 2}
       propertyPath: fireMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114230344388471580, guid: b657c08a0b723024f871e06d1bfa2193,
+        type: 2}
+      propertyPath: angularSpeed
+      value: 360
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b657c08a0b723024f871e06d1bfa2193, type: 2}

@@ -23,7 +23,7 @@ public class Character : MonoBehaviour , IDamageable {
     [SerializeField]
     protected float speed = 5;
 
-    [Range(1f, 500)]
+    [Range(1f, 1000)]
     [SerializeField]
     protected float angularSpeed = 360;
 
@@ -36,6 +36,7 @@ public class Character : MonoBehaviour , IDamageable {
     protected float turnAmount;
     protected float forwardAmount;
     protected Vector3 velocity;
+    protected Vector3 moveRaw;
     protected Vector3 groundNormal;
     protected float defaultCapsuleHeight;
     protected Vector3 defaultCapsuleCenter;
@@ -76,7 +77,11 @@ public class Character : MonoBehaviour , IDamageable {
     }
 
     public void Movement(Vector3 move) {
+
+        //当模大于1时，要进行归一化，防止在斜方向移动时，移动速度加快
         if (move.magnitude > 1f) move.Normalize();
+        //存下原本的移动输入
+        moveRaw = move;
         //将move从世界空间转向本地空间
         move = transform.InverseTransformDirection(move);
         //将move投影在地板的2D平面上
@@ -203,11 +208,19 @@ public class Character : MonoBehaviour , IDamageable {
         //转向控制
         transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
 
-        //移动控制
-        velocity = transform.forward * forwardAmount * speed;
-        if (isCrouching || isAiming) velocity *= 0.5f;
-        velocity.y = rigid.velocity.y;
-        rigid.velocity = velocity;
+        velocity = Vector3.zero;
+
+        var a = moveRaw.normalized;
+        var b = transform.forward.normalized;
+        if (Vector3.Dot(a, b) >= 0.9f) {
+            //移动控制
+            velocity = transform.forward * forwardAmount * speed;
+            if (isCrouching || isAiming) velocity *= 0.5f;
+            velocity.y = rigid.velocity.y;
+            rigid.velocity = velocity;
+        }
+
+
     }
 
     protected virtual void UpdateAnimator() {

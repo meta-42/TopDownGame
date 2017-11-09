@@ -3,37 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(LineRenderer))]
-public class Laser : MonoBehaviour {
+public class Laser : RayEmitter {
 
     public string tagName = "Player";
-    public float range = 50f;
     new public ParticleSystem particleSystem;
-
-    LineRenderer lineRenderer;
     ParticleSystem.ShapeModule shape;
-    Vector3 endPoint;
 
-    void Awake() {
-        lineRenderer = GetComponent<LineRenderer>();
+    void Start() {
         if (particleSystem != null) {
             shape = particleSystem.shape;
         }
+
+        onHit.AddListener(OnHit);
+        onLengthChange.AddListener(OnLengthChange);
     }
 
-    void Update() {
-        RaycastHit hit;
-        endPoint = transform.forward * range;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, range)) {
-            endPoint = transform.InverseTransformPoint(hit.point);
-            if (hit.collider.CompareTag(tagName)) {
-                GameController.player.Die();
-            }
+    private void OnDestroy()
+    {
+        onHit.RemoveListener(OnHit);
+        onLengthChange.RemoveListener(OnLengthChange);
+    }
+
+    void OnHit(RaycastHit hitInfo)
+    {
+        if (hitInfo.collider.CompareTag(tagName))
+        {
+            GameController.player.Die();
         }
-        if (particleSystem != null) {
-            shape.radius = Mathf.Lerp(shape.radius, endPoint.magnitude / 2, Time.deltaTime);
-            particleSystem.transform.localPosition = Vector3.Lerp(particleSystem.transform.localPosition, endPoint * 0.5f, Time.deltaTime);
+    }
+
+    void OnLengthChange(Vector3 end)
+    {
+        if (particleSystem != null)
+        {
+            shape.radius = Mathf.Lerp(shape.radius, end.magnitude / 2, Time.deltaTime);
+            particleSystem.transform.localPosition = Vector3.Lerp(particleSystem.transform.localPosition, end * 0.5f, Time.deltaTime);
         }
-        lineRenderer.SetPosition(1, endPoint);
     }
 }

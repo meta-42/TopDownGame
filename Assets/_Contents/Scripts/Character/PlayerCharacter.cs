@@ -8,6 +8,30 @@ public class PlayerCharacter : Character
 {
     bool canControl = true;
 
+    public GameObject AimTargetVisual;
+
+
+
+    private void UpdateAimTargetPos()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 2000f, 9))
+        {
+            Vector3 FinalPos = new Vector3(hit.point.x, 0, hit.point.z);
+
+            AimTargetVisual.transform.position = FinalPos;
+            AimTargetVisual.transform.LookAt(transform.position);
+
+        }
+
+        if (isAiming)
+        {
+            transform.LookAt(AimTargetVisual.transform.position);
+        }
+    }
+
+
     protected override void Start() {
         base.Start();
 
@@ -21,6 +45,9 @@ public class PlayerCharacter : Character
 
     protected override void UpdateControl() {
         base.UpdateControl();
+
+        UpdateAimTargetPos();
+
         if (!canControl) return;
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
@@ -39,6 +66,8 @@ public class PlayerCharacter : Character
         }
 
     }
+
+
 
 
     public void EndPlay() {

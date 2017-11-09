@@ -28,6 +28,9 @@ public class HitscanWeapon : Weapon
     [SerializeField]
     private GameObject tracer;
 
+    [SerializeField]
+    private GameObject ray;
+
     [Range(0f, 30f)]
     [SerializeField]
     private float spreadNormal = 0.8f;
@@ -55,6 +58,7 @@ public class HitscanWeapon : Weapon
     private float timeBetweenShotsMin;
     private float nextTimeCanFire;
     private AudioSource audioSource;
+
 
     public override bool AttackOnceHandle()
     {
@@ -99,6 +103,7 @@ public class HitscanWeapon : Weapon
         var firePos = new Vector3(user.transform.position.x,
             user.transform.position.y + user.GetComponent<CapsuleCollider>().height / 2,
             user.transform.position.z);
+        
 
         Ray ray = new Ray(firePos, user.transform.forward);
         //Vector3 spreadVector = character.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
@@ -113,6 +118,7 @@ public class HitscanWeapon : Weapon
 
             float impulse = rayImpact.GetImpulseAtDistance(hitInfo.distance, distanceMax);
             float damage = rayImpact.GetDamageAtDistance(hitInfo.distance, distanceMax);
+            Debug.Log(damage);
             var damageable = hitInfo.collider.GetComponent<IDamageable>();
             if (damageable != null)
             {

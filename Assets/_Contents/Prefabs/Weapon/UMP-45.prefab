@@ -536,7 +536,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  fireMode: 0
+  fireMode: 1
   fireAudio:
     sounds:
     - {fileID: 8300000, guid: c395b10b96469b34a972e6b6e39b05bc, type: 3}
@@ -544,8 +544,7 @@ MonoBehaviour:
     pitchRange: {x: 0.9, y: 1.1}
   muzzleFlash: {fileID: 198466659175009954}
   tracer: {fileID: 1735467526708890, guid: 9eeca4e4fb1314547aadbfed0421a513, type: 2}
-  ray: {fileID: 0}
-  spreadNormal: 0.8
+  ray: {fileID: 1227692283480212}
   spreadAim: 0.95
   rayCount: 1
   distanceMax: 150
@@ -652,7 +651,7 @@ LineRenderer:
     alignment: 0
     textureMode: 0
     generateLightingData: 0
-  m_UseWorldSpace: 0
+  m_UseWorldSpace: 1
   m_Loop: 0
 --- !u!198 &198466659175009954
 ParticleSystem:

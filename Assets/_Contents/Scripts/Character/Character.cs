@@ -8,10 +8,11 @@ using UnityEngine.AI;
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
 public class Character : MonoBehaviour , IDamageable {
-    public Vector3 offset;
     public UnityEvent onDead;
     public AudioClip dieSound;
-    public Weapon equippedWeapon;
+
+    public Weapon defaultWeapon;
+    public Transform weaponSocket;
 
     public float health = 0f;
     public float stamina = 0f;
@@ -35,9 +36,9 @@ public class Character : MonoBehaviour , IDamageable {
     protected bool isDead = false;
     protected bool isAiming = false;
 
-    [Range(0.1f,5)]
+    [Range(0.1f,3)]
     [SerializeField]
-    protected float speed = 5;
+    protected float speed = 3;
 
     [Range(1f, 1000)]
     [SerializeField]
@@ -57,6 +58,15 @@ public class Character : MonoBehaviour , IDamageable {
     protected Vector3 groundNormal;
     protected float defaultCapsuleHeight;
     protected Vector3 defaultCapsuleCenter;
+    protected Weapon equippedWeapon;
+
+    protected AnimatorStateInfo baseLayerInfo;
+    protected AnimatorStateInfo underBodyInfo;
+    protected AnimatorStateInfo upperBodyInfo;
+    protected AnimatorStateInfo rightArmInfo;
+    protected AnimatorStateInfo leftArmInfo;
+    protected AnimatorStateInfo fullBodyInfo;
+
 
     #region Public
 
@@ -132,7 +142,7 @@ public class Character : MonoBehaviour , IDamageable {
     }
 
     public void Aiming(bool aiming) {
-        if (isGrounded && aiming && stamina > aimingStamina) {
+        if (isGrounded && aiming) {
             equippedWeapon.gameObject.SetActive(true);
             isAiming = true;
         } else {
@@ -170,6 +180,18 @@ public class Character : MonoBehaviour , IDamageable {
     #endregion
 
     #region Private
+
+    void InitWeapon()
+    {
+        if (defaultWeapon)
+        {
+            Weapon NewWeapon = Instantiate(defaultWeapon, weaponSocket.position, weaponSocket.rotation);
+            NewWeapon.transform.parent = weaponSocket.transform;
+            NewWeapon.name = "Player_" + NewWeapon.name;
+
+            EquipWeapon(NewWeapon);
+        }
+    }
 
     void CheckGroundStatus() {
         RaycastHit hitInfo;
@@ -297,6 +319,7 @@ public class Character : MonoBehaviour , IDamageable {
 
         health = maxHealth;
         stamina = maxStamina;
+        InitWeapon();
     }
 
     protected virtual void Update() {
@@ -318,64 +341,35 @@ public class Character : MonoBehaviour , IDamageable {
     protected virtual void UpdateControl() { }
 
     protected virtual void UpdateMovement() {
-        //转向控制
-
-
         if (isAiming)
         {
             velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
-            if (isCrouching || isAiming) velocity *= 0.5f;
-            velocity.y = rigid.velocity.y;
-            rigid.velocity = velocity;
-
         }
         else
         {
             transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
             velocity = transform.forward * forwardAmount * speed;
-            if (isCrouching || isAiming) velocity *= 0.5f;
-            velocity.y = rigid.velocity.y;
-            rigid.velocity = velocity;
         }
 
-
-
-        //velocity = Vector3.zero;
-        //var a = moveRaw.normalized;
-        //var b = transform.forward.normalized;
-        //if (Vector3.Dot(a, b) >= 0.9f) {
-        //    //移动控制
-        //    velocity = transform.forward * forwardAmount * speed;
-        //    if (isCrouching || isAiming) velocity *= 0.5f;
-        //    velocity.y = rigid.velocity.y;
-        //    rigid.velocity = velocity;
-        //}
-
-
+        if (isCrouching || isAiming) velocity *= 0.5f;
+        velocity.y = rigid.velocity.y;
+        rigid.velocity = velocity;
+        
     }
 
     protected virtual void UpdateAnimator() {
         anim.SetFloat("Forward", forwardAmount, 0.01f, Time.deltaTime);
         anim.SetFloat("Right", rightAmount, 0.01f, Time.deltaTime);
         anim.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
+        anim.SetFloat("Speed", velocity.magnitude, 0.01f, Time.deltaTime);
         anim.SetBool("Crouch", isCrouching);
         anim.SetBool("OnGround", isGrounded);
         anim.SetBool("Aiming", isAiming);
     }
+
     #endregion
 
-    [HideInInspector]
-    public AnimatorStateInfo baseLayerInfo;
-    [HideInInspector]
-    public AnimatorStateInfo underBodyInfo;
-    [HideInInspector]
-    public AnimatorStateInfo upperBodyInfo;
-    [HideInInspector]
-    public AnimatorStateInfo rightArmInfo;
-    [HideInInspector]
-    public AnimatorStateInfo leftArmInfo;
-    [HideInInspector]
-    public AnimatorStateInfo fullBodyInfo;
+    #region Anim
 
     public int baseLayer { get { return anim.GetLayerIndex("Base Layer"); } }
     public int underBodyLayer { get { return anim.GetLayerIndex("UnderBody"); } }
@@ -433,4 +427,6 @@ public class Character : MonoBehaviour , IDamageable {
 
         anim.MatchTarget(matchPosition, matchRotation, target, weightMask, normalisedStartTime, normalisedEndTime);
     }
+#endregion
+
 }

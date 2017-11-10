@@ -9,7 +9,7 @@ public class PlayerCharacter : Character
     bool canControl = true;
 
     public GameObject AimTargetVisual;
-
+    public Transform AimTargetPos;
 
 
     private void UpdateAimTargetPos()
@@ -28,6 +28,7 @@ public class PlayerCharacter : Character
         if (isAiming)
         {
             transform.LookAt(AimTargetVisual.transform.position);
+            //equippedWeapon.transform.parent.transform.LookAt(AimTargetPos.position, Vector3.up);
         }
     }
 
@@ -39,8 +40,6 @@ public class PlayerCharacter : Character
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationY |
             RigidbodyConstraints.FreezeRotationZ;
-
-        EquipWeapon(equippedWeapon);
     }
 
     protected override void UpdateControl() {

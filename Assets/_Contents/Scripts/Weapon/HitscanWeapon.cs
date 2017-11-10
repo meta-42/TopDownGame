@@ -31,10 +31,6 @@ public class HitscanWeapon : Weapon
     [SerializeField]
     private GameObject ray;
 
-    [Range(0f, 30f)]
-    [SerializeField]
-    private float spreadNormal = 0.8f;
-
     [SerializeField]
     [Range(0f, 30f)]
     private float spreadAim = 0.95f;
@@ -97,7 +93,7 @@ public class HitscanWeapon : Weapon
 
     protected void DoHitscan()
     {
-        float spread = spreadAim; //Player.aim.Active ? spreadAim : spreadNormal;
+        float spread = spreadAim; 
         RaycastHit hitInfo;
 
         var firePos = new Vector3(user.transform.position.x,
@@ -106,8 +102,8 @@ public class HitscanWeapon : Weapon
         
 
         Ray ray = new Ray(firePos, user.transform.forward);
-        //Vector3 spreadVector = character.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
-        //ray.direction = Quaternion.Euler(spreadVector) * ray.direction;
+        Vector3 spreadVector = user.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
+        ray.direction = Quaternion.Euler(spreadVector) * ray.direction;
         Debug.DrawLine(firePos, firePos + user.transform.forward * distanceMax, Color.red, 1100);
 
         if (Physics.Raycast(ray, out hitInfo, distanceMax, damageMask, QueryTriggerInteraction.Ignore))
@@ -118,7 +114,6 @@ public class HitscanWeapon : Weapon
 
             float impulse = rayImpact.GetImpulseAtDistance(hitInfo.distance, distanceMax);
             float damage = rayImpact.GetDamageAtDistance(hitInfo.distance, distanceMax);
-            Debug.Log(damage);
             var damageable = hitInfo.collider.GetComponent<IDamageable>();
             if (damageable != null)
             {

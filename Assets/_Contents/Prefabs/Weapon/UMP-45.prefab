@@ -28,6 +28,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1121131436639804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4284800825518648}
+  m_Layer: 0
+  m_Name: LeftHandIK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1129156624502376
 GameObject:
   m_ObjectHideFlags: 0
@@ -36,25 +51,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4398608462157916}
-  - component: {fileID: 82734536596583118}
   - component: {fileID: 114010320187726130}
+  - component: {fileID: 82734536596583118}
   m_Layer: 0
   m_Name: UMP-45
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &1227692283480212
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4699526770419664}
-  m_Layer: 0
-  m_Name: Ray
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,7 +79,7 @@ GameObject:
   m_IsActive: 1
 --- !u!1 &1371887869039880
 GameObject:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -159,6 +159,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &4284800825518648
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1121131436639804}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.1, y: 0.1, z: 0.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4398608462157916}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4318884664377794
 Transform:
   m_ObjectHideFlags: 1
@@ -180,13 +193,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1129156624502376}
-  m_LocalRotation: {x: -0.50001293, y: -0.499987, z: -0.500013, w: 0.49998707}
-  m_LocalPosition: {x: -1.0258343, y: -3.3492293, z: -6.602801}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.13, y: -0, z: 5.19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4318884664377794}
   - {fileID: 4642808706039252}
-  - {fileID: 4699526770419664}
+  - {fileID: 4542797442189956}
+  - {fileID: 4284800825518648}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -197,11 +211,11 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1371887869039880}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.025000095, y: 0.21200001, z: 0.3340001}
+  m_LocalPosition: {x: 0.025000056, y: 0.21199998, z: 0.33400014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4699526770419664}
-  m_RootOrder: 0
+  m_Father: {fileID: 4398608462157916}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4642808706039252
 Transform:
@@ -217,20 +231,6 @@ Transform:
   - {fileID: 4826417432224154}
   m_Father: {fileID: 4398608462157916}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4699526770419664
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1227692283480212}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 4542797442189956}
-  m_Father: {fileID: 4398608462157916}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4826417432224154
 Transform:
@@ -494,21 +494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4850e4d56f5f48b4abd4a3f0b5c9a4af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onEquip:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  onUnequip:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  onAttack:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
+  leftHandIK: {fileID: 4284800825518648}
   rayImpact:
     damageMax: 33
     impulseMax: 15
@@ -544,15 +530,15 @@ MonoBehaviour:
     pitchRange: {x: 0.9, y: 1.1}
   muzzleFlash: {fileID: 198466659175009954}
   tracer: {fileID: 1735467526708890, guid: 9eeca4e4fb1314547aadbfed0421a513, type: 2}
-  ray: {fileID: 1227692283480212}
+  infrared: {fileID: 1371887869039880}
   spreadAim: 0.95
-  rayCount: 1
   distanceMax: 150
   damageMask:
     serializedVersion: 2
     m_Bits: 1
   shotsPerMinute: 450
   shotDuration: 0.22
+  debugVisual: 0
 --- !u!114 &114365617693294882
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -564,7 +550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45c989e452922bc4b92a4f183a427847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxLength: 48.46
+  maxLength: 6
 --- !u!120 &120900606373572608
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -601,10 +587,10 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 6.72}
+  - {x: 0, y: 0, z: 0}
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 0.1
+    widthMultiplier: 0.05
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -713,7 +699,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 2
-  randomSeed: 1181303502
+  randomSeed: 1643764780
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -3973,7 +3959,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 2
-  randomSeed: -620738035
+  randomSeed: 1740037998
   InitialModule:
     serializedVersion: 3
     enabled: 1

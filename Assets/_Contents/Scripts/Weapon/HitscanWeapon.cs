@@ -13,6 +13,8 @@ public class HitscanWeapon : Weapon
         FullAuto
     }
 
+
+
     [SerializeField]
     private RayImpact rayImpact;
 
@@ -29,15 +31,11 @@ public class HitscanWeapon : Weapon
     private GameObject tracer;
 
     [SerializeField]
-    private GameObject ray;
+    private GameObject infrared;
 
     [SerializeField]
     [Range(0f, 30f)]
     private float spreadAim = 0.95f;
-
-    [Range(1, 20)]
-    [SerializeField]
-    private int rayCount = 1;
 
     [SerializeField]
     private float distanceMax = 150f;
@@ -55,8 +53,19 @@ public class HitscanWeapon : Weapon
     private float nextTimeCanFire;
     private AudioSource audioSource;
 
+    public bool debugVisual;
 
-    public override bool AttackOnceHandle()
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        infrared.SetActive(false);
+        if (fireMode == FireMode.SemiAuto)
+            timeBetweenShotsMin = shotDuration;
+        else
+            timeBetweenShotsMin = 60f / shotsPerMinute;
+    }
+
+    public override bool OnAttackOnce()
     {
         if (Time.time < nextTimeCanFire || !isEquiped)
             return false;
@@ -68,14 +77,22 @@ public class HitscanWeapon : Weapon
         return true;
     }
 
-    public override bool AttackContinuouslyHandle()
+    public override bool OnAttackContinuously()
     {
         if (fireMode == FireMode.SemiAuto)
             return false;
 
-        return AttackOnceHandle();
+        return OnAttackOnce();
     }
 
+    public override void OnAiming(bool isAiming)
+    {
+        if (isAiming) {
+            infrared.SetActive(true);
+        } else {
+            infrared.SetActive(false);
+        }
+    }
 
     protected void Shoot()
     {
@@ -84,10 +101,7 @@ public class HitscanWeapon : Weapon
         if (muzzleFlash)
             muzzleFlash.Play(true);
 
-        for (int i = 0; i < rayCount; i++)
-            DoHitscan();
-
-        onAttack.Invoke();
+        DoHitscan();
 
     }
 
@@ -104,7 +118,11 @@ public class HitscanWeapon : Weapon
         Ray ray = new Ray(firePos, user.transform.forward);
         Vector3 spreadVector = user.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
         ray.direction = Quaternion.Euler(spreadVector) * ray.direction;
-        Debug.DrawLine(firePos, firePos + user.transform.forward * distanceMax, Color.red, 1100);
+
+        if (debugVisual) {
+            Debug.DrawLine(firePos, firePos + user.transform.forward * distanceMax, Color.red, 1100);
+
+        }
 
         if (Physics.Raycast(ray, out hitInfo, distanceMax, damageMask, QueryTriggerInteraction.Ignore))
         {
@@ -132,14 +150,4 @@ public class HitscanWeapon : Weapon
             Destroy(temp, 1);
         }
     }
-
-    private void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-        if (fireMode == FireMode.SemiAuto)
-            timeBetweenShotsMin = shotDuration;
-        else
-            timeBetweenShotsMin = 60f / shotsPerMinute;
-    }
-
 }

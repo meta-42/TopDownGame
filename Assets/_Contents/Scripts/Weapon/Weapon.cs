@@ -5,6 +5,8 @@ using System;
 
 public abstract class Weapon : MonoBehaviour
 {
+    public Transform leftHandIK;
+
     private Character _user;
     public Character user
     {
@@ -20,25 +22,20 @@ public abstract class Weapon : MonoBehaviour
 
     public bool isEquiped { get; private set; }
 
-    public UnityEngine.Events.UnityEvent onEquip;
 
-    public UnityEngine.Events.UnityEvent onUnequip;
+    public virtual bool OnAttackOnce() { return false; }
 
-    public UnityEngine.Events.UnityEvent onAttack;
+    public virtual bool OnAttackContinuously() { return false; }
 
-    public virtual bool AttackOnceHandle() { return false; }
-
-    public virtual bool AttackContinuouslyHandle() { return false; }
+    public virtual void OnAiming(bool isAiming) { }
 
     public virtual void OnEquip()
     {
         isEquiped = true;
-        onEquip.Invoke();
     }
 
     public virtual void OnUnEquip()
     {
         isEquiped = false;
-        onUnequip.Invoke();
     }
 }

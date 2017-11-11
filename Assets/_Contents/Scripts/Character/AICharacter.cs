@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using NodeCanvas.BehaviourTrees;
 
 
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Sensor))]
 public class AICharacter : Character {
 
     NavMeshAgent agent;
-    BehaviourTreeOwner behviourTree;
+    Sensor sensor;
+
+   // List<Transform> waypoints;
 
     protected override void Start() {
         base.Start();
         agent = GetComponent<NavMeshAgent>();
-        behviourTree = GetComponent<BehaviourTreeOwner>();
+        sensor = GetComponent<Sensor>();
 
         rigid.constraints = RigidbodyConstraints.None |
             RigidbodyConstraints.FreezeRotation |
@@ -44,11 +46,6 @@ public class AICharacter : Character {
         {
             agent.updatePosition = false;
             agent.updateRotation = false;
-        }
-
-        if (behviourTree)
-        {
-            behviourTree.StopBehaviour();
         }
     }
 

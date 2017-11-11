@@ -7,8 +7,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
-public class Character : MonoBehaviour , IDamageable {
-    public UnityEvent onDead;
+public abstract class Character : MonoBehaviour , IDamageable {
     public AudioClip dieSound;
 
     public Weapon defaultWeapon;
@@ -68,9 +67,94 @@ public class Character : MonoBehaviour , IDamageable {
     protected AnimatorStateInfo fullBodyInfo;
 
 
+    #region Cycle
+
+    protected virtual void Start()
+    {
+        anim = GetComponent<Animator>();
+        rigid = GetComponent<Rigidbody>();
+        capsule = GetComponent<CapsuleCollider>();
+        defaultCapsuleHeight = capsule.height;
+        defaultCapsuleCenter = capsule.center;
+        rigid.drag = 8;
+        rigid.mass = 30;
+
+        health = maxHealth;
+        stamina = maxStamina;
+
+        SpawnDefaultWeapon();
+    }
+
+    protected virtual void Update()
+    {
+        if (!isDead)
+        {
+            UpdateControl();
+        }
+
+        CheckHealth();
+        CheckStamina();
+
+        StaminaRecovery();
+        HealthRecovery();
+
+        CheckGroundStatus();
+
+        UpdateWeapon();
+        UpdateMovement();
+        UpdateAnimator();
+    }
+
+    protected virtual void UpdateWeapon() {
+        equippedWeapon.gameObject.SetActive(isAiming);
+        equippedWeapon.OnAiming(isAiming);
+    }
+
+    protected virtual void UpdateControl() { }
+
+    protected virtual void UpdateMovement()
+    {
+        if (isAiming)
+        {
+            velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
+        }
+        else
+        {
+            transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
+            velocity = transform.forward * forwardAmount * speed;
+        }
+
+        if (isCrouching || isAiming) velocity *= 0.5f;
+        velocity.y = rigid.velocity.y;
+        rigid.velocity = velocity;
+
+    }
+
+    protected virtual void UpdateAnimator()
+    {
+        anim.SetFloat("Forward", forwardAmount, 0.01f, Time.deltaTime);
+        anim.SetFloat("Right", rightAmount, 0.01f, Time.deltaTime);
+        anim.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
+        anim.SetFloat("Speed", velocity.magnitude, 0.01f, Time.deltaTime);
+        anim.SetBool("Crouch", isCrouching);
+        anim.SetBool("OnGround", isGrounded);
+        anim.SetBool("Aiming", isAiming);
+    }
+
+    protected virtual void OnAnimatorIK(int layerIndex)
+    {
+        if (isAiming)
+        {
+            anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+            anim.SetIKPosition(AvatarIKGoal.LeftHand, equippedWeapon.leftHandIK.position);
+        }
+    }
+
+    #endregion
+
     #region Public
 
-    public bool Fire(bool continuously) {
+    public virtual bool Fire(bool continuously) {
         if (!isAiming) return false;
 
         if (equippedWeapon == null)
@@ -79,9 +163,9 @@ public class Character : MonoBehaviour , IDamageable {
         bool attackWasSuccessful;
 
         if (continuously)
-            attackWasSuccessful = equippedWeapon.AttackContinuouslyHandle();
+            attackWasSuccessful = equippedWeapon.OnAttackContinuously();
         else
-            attackWasSuccessful = equippedWeapon.AttackOnceHandle();
+            attackWasSuccessful = equippedWeapon.OnAttackOnce();
 
 
         if (attackWasSuccessful) {
@@ -91,19 +175,19 @@ public class Character : MonoBehaviour , IDamageable {
         return attackWasSuccessful;
     }
 
-    public void EquipWeapon(Weapon Weapon) {
+    public virtual void EquipWeapon(Weapon Weapon) {
         if (Weapon) {
             SetCurrentWeapon(Weapon, equippedWeapon);
         }
     }
 
-    public void UnEquipWeapon(Weapon Weapon) {
+    public virtual void UnEquipWeapon(Weapon Weapon) {
         if (Weapon && Weapon == equippedWeapon) {
             SetCurrentWeapon(null, Weapon);
         }
     }
 
-    public void Movement(Vector3 move) {
+    public virtual void Movement(Vector3 move) {
 
         //当模大于1时，要进行归一化，防止在斜方向移动时，移动速度加快
         if (move.magnitude > 1f) move.Normalize();
@@ -121,8 +205,8 @@ public class Character : MonoBehaviour , IDamageable {
 
     }
 
-    public void Crouching(bool crouch) {
-        if (isGrounded && crouch) {
+    public virtual void Crouching(bool crouch) {
+        if (isGrounded && !isAiming && crouch ) {
             if (isCrouching) return;
             capsule.height = capsule.height / 2f;
             capsule.center = capsule.center / 2f;
@@ -141,12 +225,10 @@ public class Character : MonoBehaviour , IDamageable {
         }
     }
 
-    public void Aiming(bool aiming) {
-        if (isGrounded && aiming) {
-            equippedWeapon.gameObject.SetActive(true);
+    public virtual void Aiming(bool aiming) {
+        if (isGrounded && !isCrouching && aiming) {
             isAiming = true;
         } else {
-            equippedWeapon.gameObject.SetActive(false);
             isAiming = false;
         }
     }
@@ -159,7 +241,6 @@ public class Character : MonoBehaviour , IDamageable {
         capsule.height = 0.2f;
         capsule.center = new Vector3(0, 0.3f, 0);
         AudioSource.PlayClipAtPoint(dieSound, transform.position);
-        onDead.Invoke();
     }
 
     #endregion
@@ -181,13 +262,13 @@ public class Character : MonoBehaviour , IDamageable {
 
     #region Private
 
-    void InitWeapon()
+    void SpawnDefaultWeapon()
     {
         if (defaultWeapon)
         {
             Weapon NewWeapon = Instantiate(defaultWeapon, weaponSocket.position, weaponSocket.rotation);
             NewWeapon.transform.parent = weaponSocket.transform;
-            NewWeapon.name = "Player_" + NewWeapon.name;
+            NewWeapon.name = transform.name + "_" + NewWeapon.name;
 
             EquipWeapon(NewWeapon);
         }
@@ -302,69 +383,6 @@ public class Character : MonoBehaviour , IDamageable {
         {
             stamina = 0;
         }
-    }
-
-    #endregion
-
-    #region Cycle
-
-    protected virtual void Start() {
-        anim = GetComponent<Animator>();
-        rigid = GetComponent<Rigidbody>();
-        capsule = GetComponent<CapsuleCollider>();
-        defaultCapsuleHeight = capsule.height;
-        defaultCapsuleCenter = capsule.center;
-        rigid.drag = 8;
-        rigid.mass = 30;
-
-        health = maxHealth;
-        stamina = maxStamina;
-        InitWeapon();
-    }
-
-    protected virtual void Update() {
-        if (!isDead) {
-            UpdateControl();
-        }
-
-        CheckHealth();
-        CheckStamina();
-
-        StaminaRecovery();
-        HealthRecovery();
-
-        CheckGroundStatus();
-        UpdateMovement();
-        UpdateAnimator();
-    }
-
-    protected virtual void UpdateControl() { }
-
-    protected virtual void UpdateMovement() {
-        if (isAiming)
-        {
-            velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
-        }
-        else
-        {
-            transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
-            velocity = transform.forward * forwardAmount * speed;
-        }
-
-        if (isCrouching || isAiming) velocity *= 0.5f;
-        velocity.y = rigid.velocity.y;
-        rigid.velocity = velocity;
-        
-    }
-
-    protected virtual void UpdateAnimator() {
-        anim.SetFloat("Forward", forwardAmount, 0.01f, Time.deltaTime);
-        anim.SetFloat("Right", rightAmount, 0.01f, Time.deltaTime);
-        anim.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
-        anim.SetFloat("Speed", velocity.magnitude, 0.01f, Time.deltaTime);
-        anim.SetBool("Crouch", isCrouching);
-        anim.SetBool("OnGround", isGrounded);
-        anim.SetBool("Aiming", isAiming);
     }
 
     #endregion

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Sensor))]
 public class AICharacter : Character {
@@ -11,12 +10,34 @@ public class AICharacter : Character {
     NavMeshAgent agent;
     Sensor sensor;
 
-   // List<Transform> waypoints;
+    //施工中
+    public WaypointGroup waypointGroup;
+    int currentIndex = 0;
+    Vector3 lastRequest;
+
+    void UpdatePatrol() {
+
+        var points = waypointGroup.waypoints;
+
+        var targetPos = points[currentIndex].transform.position;
+
+        if (!agent.SetDestination(targetPos)) {
+            return;
+        }
+
+        //lastRequest = targetPos;
+
+        if(agent.remainingDistance <= agent.stoppingDistance) {
+            currentIndex = (currentIndex + 1) % points.Count;
+            Debug.Log(currentIndex);
+        }
+    }
 
     protected override void Start() {
         base.Start();
         agent = GetComponent<NavMeshAgent>();
         sensor = GetComponent<Sensor>();
+
 
         rigid.constraints = RigidbodyConstraints.None |
             RigidbodyConstraints.FreezeRotation |
@@ -26,6 +47,7 @@ public class AICharacter : Character {
 
     protected override void UpdateControl() {
         base.UpdateControl();
+        UpdatePatrol();
         Movement(agent.velocity);
     }
 
@@ -34,8 +56,8 @@ public class AICharacter : Character {
         transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
 
         //移动控制
-        speed = agent.speed;
-        angularSpeed = agent.angularSpeed;
+        agent.speed = speed;
+        agent.angularSpeed = angularSpeed;
         velocity = agent.velocity;
     }
 

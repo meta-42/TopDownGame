@@ -8,6 +8,7 @@ public class CustomMaskDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
+        
         CustomMaskAttribute flagSettings = (CustomMaskAttribute)attribute;
         Enum targetEnum = GetBaseProperty<Enum>(property);
 

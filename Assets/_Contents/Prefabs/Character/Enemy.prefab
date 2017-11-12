@@ -1085,6 +1085,7 @@ MonoBehaviour:
   speed: 3
   angularSpeed: 360
   groundCheckDistance: 0.2
+  waypointGroup: {fileID: 0}
 --- !u!114 &114942572740583988
 MonoBehaviour:
   m_ObjectHideFlags: 1

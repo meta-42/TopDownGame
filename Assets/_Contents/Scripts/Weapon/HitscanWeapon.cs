@@ -101,19 +101,14 @@ public class HitscanWeapon : Weapon
         if (muzzleFlash)
             muzzleFlash.Play(true);
 
-        DoHitscan();
 
-    }
-
-    protected void DoHitscan()
-    {
-        float spread = spreadAim; 
+        float spread = spreadAim;
         RaycastHit hitInfo;
 
         var firePos = new Vector3(user.transform.position.x,
             user.transform.position.y + user.GetComponent<CapsuleCollider>().height / 2,
             user.transform.position.z);
-        
+
 
         Ray ray = new Ray(firePos, user.transform.forward);
         Vector3 spreadVector = user.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
@@ -124,22 +119,18 @@ public class HitscanWeapon : Weapon
 
         }
 
-        if (Physics.Raycast(ray, out hitInfo, distanceMax, damageMask, QueryTriggerInteraction.Ignore))
-        {
-            if(hitInfo.collider.gameObject == user) {
+        if (Physics.Raycast(ray, out hitInfo, distanceMax, damageMask, QueryTriggerInteraction.Ignore)) {
+            if (hitInfo.collider.gameObject == user) {
                 return;
             }
 
             float impulse = rayImpact.GetImpulseAtDistance(hitInfo.distance, distanceMax);
             float damage = rayImpact.GetDamageAtDistance(hitInfo.distance, distanceMax);
             var damageable = hitInfo.collider.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
+            if (damageable != null) {
                 var damageData = new DamageEventData(-damage, user, hitInfo.point, ray.direction, impulse);
                 damageable.TakeDamage(damageData);
-            }
-            else if (hitInfo.rigidbody)
-            {
+            } else if (hitInfo.rigidbody) {
                 hitInfo.rigidbody.AddForceAtPosition(ray.direction * impulse, hitInfo.point, ForceMode.Impulse);
             }
 
@@ -149,5 +140,6 @@ public class HitscanWeapon : Weapon
             var temp = Instantiate(tracer, transform.position, Quaternion.LookRotation(ray.direction));
             Destroy(temp, 1);
         }
+
     }
 }

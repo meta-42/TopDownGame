@@ -13,12 +13,21 @@ public class PlayerCharacter : Character
 
     protected override void Start() {
         base.Start();
+
         SpawnDefaultAimTarget();
 
         rigid.constraints = RigidbodyConstraints.None | 
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationY |
             RigidbodyConstraints.FreezeRotationZ;
+
+    }
+
+    protected virtual void OnAnimatorIK(int layerIndex) {
+        if (isAiming) {
+            anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+            anim.SetIKPosition(AvatarIKGoal.LeftHand, equippedWeapon.leftHandIK.position);
+        }
     }
 
     protected override void UpdateControl() {
@@ -38,9 +47,16 @@ public class PlayerCharacter : Character
             rigid.AddForce(dashVelocity, ForceMode.VelocityChange);
         }
 
-        if(Input.GetButton("Fire1") && isAiming) {
-            Fire(true);
+        if (isAiming) {
+            if (Input.GetButton("Fire1")) {
+                Fire(true);
+            }
+            if (Input.GetButtonDown("Fire1")) {
+                Fire(false);
+            }
         }
+
+
     }
 
     protected override void UpdateMovement() {
@@ -59,6 +75,7 @@ public class PlayerCharacter : Character
 
     void SpawnDefaultAimTarget() {
         if (defaultAimTarget) {
+            Cursor.visible = false;
             aimTarget = Instantiate(defaultAimTarget);
             aimTargetPos = aimTarget.transform.Find("AimPos");
         }

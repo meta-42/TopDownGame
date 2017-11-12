@@ -141,15 +141,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
         anim.SetBool("Aiming", isAiming);
     }
 
-    protected virtual void OnAnimatorIK(int layerIndex)
-    {
-        if (isAiming)
-        {
-            anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-            anim.SetIKPosition(AvatarIKGoal.LeftHand, equippedWeapon.leftHandIK.position);
-        }
-    }
-
     #endregion
 
     #region Public
@@ -226,7 +217,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     }
 
     public virtual void Aiming(bool aiming) {
-        if (isGrounded && !isCrouching && aiming) {
+        if (isGrounded && !isCrouching && aiming && stamina > aimingStamina) {
             isAiming = true;
         } else {
             isAiming = false;
@@ -342,7 +333,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     {
         if (isAiming)
         {
-            currentStaminaRecoveryDelay = 0.25f;
+            currentStaminaRecoveryDelay = 1f;
             ReduceStamina(aimingStamina, true);
         }
     }

@@ -76,7 +76,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
         capsule = GetComponent<CapsuleCollider>();
         defaultCapsuleHeight = capsule.height;
         defaultCapsuleCenter = capsule.center;
-        rigid.drag = 8;
+        rigid.drag = 5;
         rigid.mass = 30;
 
         health = maxHealth;
@@ -125,9 +125,12 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
 
         if (isCrouching || isAiming) velocity *= 0.5f;
-        velocity.y = rigid.velocity.y;
-        rigid.velocity = velocity;
+        //velocity.y = rigid.velocity.y;
+        //rigid.velocity = velocity;
+    }
 
+    void FixedUpdate() {
+        rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
     }
 
     protected virtual void UpdateAnimator()

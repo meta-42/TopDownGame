@@ -12327,12 +12327,12 @@ Prefab:
     - target: {fileID: 224958579721311392, guid: b657c08a0b723024f871e06d1bfa2193,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 388.5
+      value: 518.5
       objectReference: {fileID: 0}
     - target: {fileID: 224958579721311392, guid: b657c08a0b723024f871e06d1bfa2193,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 220
+      value: 293
       objectReference: {fileID: 0}
     - target: {fileID: 224958579721311392, guid: b657c08a0b723024f871e06d1bfa2193,
         type: 2}
@@ -12353,6 +12353,16 @@ Prefab:
         type: 2}
       propertyPath: aimingStamina
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 54426881980813116, guid: b657c08a0b723024f871e06d1bfa2193,
+        type: 2}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114230344388471580, guid: b657c08a0b723024f871e06d1bfa2193,
+        type: 2}
+      propertyPath: groundCheckDistance
+      value: 0.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b657c08a0b723024f871e06d1bfa2193, type: 2}

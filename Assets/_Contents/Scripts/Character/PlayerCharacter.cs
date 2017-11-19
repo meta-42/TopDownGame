@@ -40,11 +40,18 @@ public class PlayerCharacter : Character
         var move = v * Vector3.forward + h * Vector3.right;
         Movement(move);
         Crouching(Input.GetKey(KeyCode.C));
-        Aiming(Input.GetButton("Fire2"));
+        Aiming(Input.GetButton("Fire3"));
 
-        if (Input.GetKeyDown(KeyCode.LeftShift)) {
-            Vector3 dashVelocity = transform.forward * 100;
+        if (Input.GetButtonDown("Fire2")) {
+            var targetPos = aimTarget.transform.position;
+            var dir = (targetPos - transform.position).normalized;
+            var distance = (targetPos - transform.position).magnitude;
+
+            //transform.position = aimTarget.transform.position;
+            //Vector3 dashVelocity = transform.forward * 100;
+            Vector3 dashVelocity = Vector3.Scale(dir, distance * new Vector3((Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime), 0, (Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime)));
             rigid.AddForce(dashVelocity, ForceMode.VelocityChange);
+            transform.LookAt(targetPos);
         }
 
         if (isAiming) {

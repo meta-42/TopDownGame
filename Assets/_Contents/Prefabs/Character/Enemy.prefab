@@ -1074,8 +1074,6 @@ MonoBehaviour:
   weaponSocket: {fileID: 4269794221881166}
   health: 0
   stamina: 0
-  dashStamina: 30
-  aimingStamina: 30
   maxHealth: 100
   healthRecovery: 0
   maxStamina: 200

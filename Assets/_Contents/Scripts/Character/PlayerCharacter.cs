@@ -11,11 +11,13 @@ public class PlayerCharacter : Character
     GameObject aimTarget;
     Transform aimTargetPos;
 
+    public float dashStamina = 30f;
+    public float dashDistance = 5f;
+
     protected override void Start() {
         base.Start();
 
         SpawnDefaultAimTarget();
-
         rigid.constraints = RigidbodyConstraints.None | 
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationY |
@@ -40,30 +42,19 @@ public class PlayerCharacter : Character
         var move = v * Vector3.forward + h * Vector3.right;
         Movement(move);
         Crouching(Input.GetKey(KeyCode.C));
-        Aiming(Input.GetButton("Fire3"));
+        Aiming(Input.GetButton("Fire2"));
 
-        if (Input.GetButtonDown("Fire2")) {
-            var targetPos = aimTarget.transform.position;
-            var dir = (targetPos - transform.position).normalized;
-            var distance = (targetPos - transform.position).magnitude;
-
-            //transform.position = aimTarget.transform.position;
-            //Vector3 dashVelocity = transform.forward * 100;
-            Vector3 dashVelocity = Vector3.Scale(dir, distance * new Vector3((Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime), 0, (Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime)));
-            rigid.AddForce(dashVelocity, ForceMode.VelocityChange);
-            transform.LookAt(targetPos);
+        if (Input.GetButton("Fire1")) {
+            Fire(true);
         }
 
-        if (isAiming) {
-            if (Input.GetButton("Fire1")) {
-                Fire(true);
-            }
-            if (Input.GetButtonDown("Fire1")) {
-                Fire(false);
-            }
+        if (Input.GetButtonDown("Fire1")) {
+            Fire(false);
         }
 
-
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            Dash();
+        }
     }
 
     protected override void UpdateMovement() {
@@ -78,6 +69,19 @@ public class PlayerCharacter : Character
     {
         base.Die();
         StartCoroutine(OnRestartLevel());
+    }
+
+    void Dash() {
+        if (isAiming) return;
+        if (stamina < dashStamina) return;
+        if (moveRaw.magnitude <= 0) return;
+
+        currentStaminaRecoveryDelay = 1f;
+        ReduceStamina(dashStamina, false);
+
+        Vector3 dashVelocity = Vector3.Scale(moveRaw, dashDistance * new Vector3((Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime), 0, (Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime)));
+        rigid.AddForce(dashVelocity, ForceMode.VelocityChange);
+        anim.Play("Dash");
     }
 
     void SpawnDefaultAimTarget() {

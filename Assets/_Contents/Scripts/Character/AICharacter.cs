@@ -13,7 +13,6 @@ public class AICharacter : Character {
     //施工中
     public WaypointGroup waypointGroup;
     int currentIndex = 0;
-    Vector3 lastRequest;
 
     void UpdatePatrol() {
 
@@ -25,7 +24,7 @@ public class AICharacter : Character {
             return;
         }
 
-        //lastRequest = targetPos;
+
 
         if(agent.remainingDistance <= agent.stoppingDistance) {
             currentIndex = (currentIndex + 1) % points.Count;

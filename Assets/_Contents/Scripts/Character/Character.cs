@@ -16,8 +16,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
     public float health = 0f;
     public float stamina = 0f;
 
-    public float dashStamina = 30f;
-    public float aimingStamina = 30f;
 
     public float maxHealth = 100f;
     public float healthRecovery = 0f;
@@ -92,18 +90,19 @@ public abstract class Character : MonoBehaviour , IDamageable {
             UpdateControl();
         }
 
-        CheckHealth();
-        CheckStamina();
 
-        StaminaRecovery();
-        HealthRecovery();
-
-        CheckGroundStatus();
-
+        UpdateStatus();
         UpdateWeapon();
         UpdateMovement();
         UpdateAnimator();
     }
+
+    protected virtual void UpdateStatus() {
+        CheckGround();
+        StaminaRecovery();
+        HealthRecovery();
+    }
+
 
     protected virtual void UpdateWeapon() {
         equippedWeapon.gameObject.SetActive(isAiming);
@@ -220,7 +219,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     }
 
     public virtual void Aiming(bool aiming) {
-        if (isGrounded && !isCrouching && aiming && stamina > aimingStamina) {
+        if (isGrounded && !isCrouching && aiming) {
             isAiming = true;
         } else {
             isAiming = false;
@@ -243,18 +242,33 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     public virtual void TakeDamage(DamageEventData damageData) {
         if (damageData == null) return;
-        if (health <= 0) return;
 
-        health += damageData.delta;
-        if(health > 0)
-        {
+        if(health > 0) {
+            health += damageData.delta;
             anim.Play("Hit");
+        } else {
+            if (!isDead) Die();
         }
     }
 
     #endregion
 
+
     #region Private
+
+    void CheckGround() {
+        RaycastHit hitInfo;
+
+        Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * groundCheckDistance));
+
+        if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, groundCheckDistance)) {
+            groundNormal = hitInfo.normal;
+            isGrounded = true;
+        } else {
+            isGrounded = false;
+            groundNormal = Vector3.up;
+        }
+    }
 
     void SpawnDefaultWeapon()
     {
@@ -268,19 +282,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
     }
 
-    void CheckGroundStatus() {
-        RaycastHit hitInfo;
-
-        Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * groundCheckDistance));
-
-        if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, groundCheckDistance)) {
-            groundNormal = hitInfo.normal;
-            isGrounded = true;
-        } else {
-            isGrounded = false;
-            groundNormal = Vector3.up;
-        }
-    }
 
     void SetCurrentWeapon(Weapon NewWeapon, Weapon LastWeapon /*= NULL*/) {
         Weapon LocalLastWeapon = null;
@@ -303,15 +304,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
     }
 
-
-    void CheckHealth()
-    {
-        if (health <= 0 && !isDead)
-        {
-            Die();
-        }
-    }
-
     void HealthRecovery()
     {
         if (health <= 0 || healthRecovery == 0) return;
@@ -329,15 +321,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
             {
                 health = Mathf.Lerp(health, maxHealth, healthRecovery * Time.deltaTime);
             }
-        }
-    }
-
-    void CheckStamina()
-    {
-        if (isAiming)
-        {
-            currentStaminaRecoveryDelay = 1f;
-            ReduceStamina(aimingStamina, true);
         }
     }
 

@@ -28,7 +28,7 @@ public class AICharacter : Character {
 
         if(agent.remainingDistance <= agent.stoppingDistance) {
             currentIndex = (currentIndex + 1) % points.Count;
-            Debug.Log(currentIndex);
+            //Debug.Log(currentIndex);
         }
     }
 

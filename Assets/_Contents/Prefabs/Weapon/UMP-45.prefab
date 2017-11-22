@@ -378,7 +378,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.222
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -495,8 +495,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leftHandIK: {fileID: 4284800825518648}
-  rayImpact:
-    damageMax: 33
+  type: 1
+  hitImpact:
+    damageMax: 15
     impulseMax: 15
     distanceCurve:
       serializedVersion: 2
@@ -522,6 +523,18 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    metalHitEffect: {fileID: 0}
+    sandHitEffect: {fileID: 0}
+    stoneHitEffect: {fileID: 0}
+    waterLeakEffect: {fileID: 0}
+    waterLeakExtinguishEffect: {fileID: 0}
+    woodHitEffect: {fileID: 0}
+    fleshHitEffects:
+    - {fileID: 1000013169864706, guid: e5a3d6da48298a0458c1990f58c27069, type: 2}
+    - {fileID: 1000010191825552, guid: 83e55d3418297934fab882559d009285, type: 2}
+    defaultHitSound:
+    - {fileID: 8300000, guid: 8d6150f9ab8b3944ca739a12d9a21e3f, type: 3}
+    - {fileID: 8300000, guid: f66e4714a5df68d4283439d9f5595c60, type: 3}
   fireMode: 1
   fireAudio:
     sounds:

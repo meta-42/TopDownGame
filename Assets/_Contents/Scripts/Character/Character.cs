@@ -10,7 +10,9 @@ using UnityEngine.AI;
 public abstract class Character : MonoBehaviour , IDamageable {
     public AudioClip dieSound;
 
-    public Weapon defaultWeapon;
+    public MeleeWeapon defaultMeleeWeapon;
+    public ShootWeapon defaultShootWeapon;
+
     public Transform weaponSocket;
 
     public float health = 0f;
@@ -55,7 +57,8 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected Vector3 groundNormal;
     protected float defaultCapsuleHeight;
     protected Vector3 defaultCapsuleCenter;
-    protected Weapon equippedWeapon;
+    protected MeleeWeapon equippedMeleeWeapon;
+    protected ShootWeapon equippedShootWeapon;
 
     protected AnimatorStateInfo baseLayerInfo;
     protected AnimatorStateInfo underBodyInfo;
@@ -64,6 +67,16 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected AnimatorStateInfo leftArmInfo;
     protected AnimatorStateInfo fullBodyInfo;
 
+    public void SetActiveAttack(bool active) {
+
+        if (equippedMeleeWeapon != null) {
+            equippedMeleeWeapon.SetActiveDamage(active);
+        }
+    }
+
+    public void ResetAttack() {
+        anim.ResetTrigger("Attack");
+    }
 
     #region Cycle
 
@@ -105,8 +118,23 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
 
     protected virtual void UpdateWeapon() {
-        equippedWeapon.gameObject.SetActive(isAiming);
-        equippedWeapon.OnAiming(isAiming);
+        if (equippedShootWeapon) {
+            equippedShootWeapon.OnAiming(isAiming);
+
+        }
+        if (isAiming) {
+            if (equippedShootWeapon)
+                equippedShootWeapon.gameObject.SetActive(true);
+            if (equippedMeleeWeapon)
+                equippedMeleeWeapon.gameObject.SetActive(false);
+        } else {
+            if (equippedShootWeapon)
+                equippedShootWeapon.gameObject.SetActive(false);
+            if (equippedMeleeWeapon)
+                equippedMeleeWeapon.gameObject.SetActive(true);
+        }
+
+
     }
 
     protected virtual void UpdateControl() { }
@@ -124,12 +152,18 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
 
         if (isCrouching || isAiming) velocity *= 0.5f;
-        //velocity.y = rigid.velocity.y;
-        //rigid.velocity = velocity;
+        velocity.y = rigid.velocity.y;
+        rigid.velocity = velocity;
     }
 
     void FixedUpdate() {
-        rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
+        if (InAnimatorStateWithTag("action")) {
+            //anim.applyRootMotion = true;
+        } else {
+            //anim.applyRootMotion = false;
+            //rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
+
+        }
     }
 
     protected virtual void UpdateAnimator()
@@ -141,6 +175,8 @@ public abstract class Character : MonoBehaviour , IDamageable {
         anim.SetBool("Crouch", isCrouching);
         anim.SetBool("OnGround", isGrounded);
         anim.SetBool("Aiming", isAiming);
+
+
     }
 
     #endregion
@@ -150,15 +186,15 @@ public abstract class Character : MonoBehaviour , IDamageable {
     public virtual bool Fire(bool continuously) {
         if (!isAiming) return false;
 
-        if (equippedWeapon == null)
+        if (equippedShootWeapon == null)
             return false;
 
         bool attackWasSuccessful;
 
         if (continuously)
-            attackWasSuccessful = equippedWeapon.OnAttackContinuously();
+            attackWasSuccessful = equippedShootWeapon.OnAttackContinuously();
         else
-            attackWasSuccessful = equippedWeapon.OnAttackOnce();
+            attackWasSuccessful = equippedShootWeapon.OnAttackOnce();
 
 
         if (attackWasSuccessful) {
@@ -168,15 +204,29 @@ public abstract class Character : MonoBehaviour , IDamageable {
         return attackWasSuccessful;
     }
 
-    public virtual void EquipWeapon(Weapon Weapon) {
-        if (Weapon) {
-            SetCurrentWeapon(Weapon, equippedWeapon);
+    public virtual void EquipWeapon(Weapon Weapon, WeaponType type) {
+        if (!Weapon) return;
+
+        if (type == WeaponType.Shoot) {
+            SetCurrentWeapon(Weapon, equippedShootWeapon, WeaponType.Shoot);
+        } else if (type == WeaponType.Melee) {
+            SetCurrentWeapon(Weapon, equippedMeleeWeapon, WeaponType.Melee);
         }
     }
 
-    public virtual void UnEquipWeapon(Weapon Weapon) {
-        if (Weapon && Weapon == equippedWeapon) {
-            SetCurrentWeapon(null, Weapon);
+    public virtual void UnEquipWeapon(Weapon Weapon, WeaponType type) {
+        if (!Weapon) return;
+
+        if (type == WeaponType.Shoot) {
+
+            if (Weapon != equippedShootWeapon) return;
+            SetCurrentWeapon(null, Weapon, WeaponType.Shoot);
+
+        } else if (type == WeaponType.Melee) {
+
+            if (Weapon != equippedMeleeWeapon) return;
+            SetCurrentWeapon(null, Weapon, WeaponType.Melee);
+
         }
     }
 
@@ -243,7 +293,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     public virtual void TakeDamage(DamageEventData damageData) {
         if (damageData == null) return;
 
-        if(health > 0) {
+        if (health > Mathf.Abs(damageData.delta) || damageData.delta > 0) {
             health += damageData.delta;
             anim.Play("Hit");
         } else {
@@ -272,36 +322,52 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     void SpawnDefaultWeapon()
     {
-        if (defaultWeapon)
+        if (defaultShootWeapon)
         {
-            Weapon NewWeapon = Instantiate(defaultWeapon, weaponSocket.position, weaponSocket.rotation);
+            Weapon NewWeapon = Instantiate(defaultShootWeapon, weaponSocket.position, weaponSocket.rotation);
             NewWeapon.transform.parent = weaponSocket.transform;
-            NewWeapon.name = transform.name + "_" + NewWeapon.name;
+            EquipWeapon(NewWeapon, WeaponType.Shoot);
+        }
 
-            EquipWeapon(NewWeapon);
+        if (defaultMeleeWeapon) {
+            Weapon NewWeapon = Instantiate(defaultMeleeWeapon, weaponSocket.position, weaponSocket.rotation);
+            NewWeapon.transform.parent = weaponSocket.transform;
+            EquipWeapon(NewWeapon, WeaponType.Melee);
         }
     }
 
 
-    void SetCurrentWeapon(Weapon NewWeapon, Weapon LastWeapon /*= NULL*/) {
+    void SetCurrentWeapon(Weapon newWeapon, Weapon lastWeapon, WeaponType type) {
         Weapon LocalLastWeapon = null;
+        if (type == WeaponType.Shoot) {
 
-        if (LastWeapon != null) {
-            LocalLastWeapon = LastWeapon;
-        } else if (NewWeapon != equippedWeapon) {
-            LocalLastWeapon = equippedWeapon;
+            if (lastWeapon != null) {
+                LocalLastWeapon = lastWeapon;
+            } else if (newWeapon != equippedShootWeapon) {
+                LocalLastWeapon = equippedShootWeapon;
+            }
+
+            if (LocalLastWeapon) LocalLastWeapon.OnUnEquip();
+
+            equippedShootWeapon = newWeapon as ShootWeapon;
+
+            if (newWeapon) newWeapon.OnEquip();
+
+        } else if (type == WeaponType.Melee) {
+
+            if (lastWeapon != null) {
+                LocalLastWeapon = lastWeapon;
+            } else if (newWeapon != equippedMeleeWeapon) {
+                LocalLastWeapon = equippedMeleeWeapon;
+            }
+
+            if (LocalLastWeapon) LocalLastWeapon.OnUnEquip();
+
+            equippedMeleeWeapon = newWeapon as MeleeWeapon;
+
+            if (newWeapon) newWeapon.OnEquip();
         }
 
-        if (LocalLastWeapon) {
-            LocalLastWeapon.OnUnEquip();
-        }
-
-        equippedWeapon = NewWeapon;
-
-        if (NewWeapon) {
-
-            NewWeapon.OnEquip();
-        }
     }
 
     void HealthRecovery()
@@ -367,11 +433,11 @@ public abstract class Character : MonoBehaviour , IDamageable {
     #region Anim
 
     public int baseLayer { get { return anim.GetLayerIndex("Base Layer"); } }
-    public int underBodyLayer { get { return anim.GetLayerIndex("UnderBody"); } }
-    public int rightArmLayer { get { return anim.GetLayerIndex("RightArm"); } }
-    public int leftArmLayer { get { return anim.GetLayerIndex("LeftArm"); } }
-    public int upperBodyLayer { get { return anim.GetLayerIndex("UpperBody"); } }
-    public int fullbodyLayer { get { return anim.GetLayerIndex("FullBody"); } }
+    public int underBodyLayer { get { return anim.GetLayerIndex("Under Body"); } }
+    public int rightArmLayer { get { return anim.GetLayerIndex("Right Arm"); } }
+    public int leftArmLayer { get { return anim.GetLayerIndex("Left Arm"); } }
+    public int upperBodyLayer { get { return anim.GetLayerIndex("Upper Body"); } }
+    public int fullbodyLayer { get { return anim.GetLayerIndex("Full Body"); } }
 
     public virtual void RefreshAnimatorState()
     {

@@ -3,9 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public enum WeaponType {
+    Melee,
+    Shoot,
+}
+
+
 public abstract class Weapon : MonoBehaviour
 {
     public Transform leftHandIK;
+
+    [HideInInspector]
+    public WeaponType type;
+
+    [SerializeField]
+    protected HitImpact hitImpact;
+
 
     private Character _user;
     public Character user
@@ -22,13 +35,6 @@ public abstract class Weapon : MonoBehaviour
 
     public bool isEquiped { get; private set; }
 
-
-    public virtual bool OnAttackOnce() { return false; }
-
-    public virtual bool OnAttackContinuously() { return false; }
-
-    public virtual void OnAiming(bool isAiming) { }
-
     public virtual void OnEquip()
     {
         isEquiped = true;
@@ -38,4 +44,6 @@ public abstract class Weapon : MonoBehaviour
     {
         isEquiped = false;
     }
+
+
 }

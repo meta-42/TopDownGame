@@ -1069,8 +1069,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dieSound: {fileID: 8300000, guid: 88b4824820ceec7429f3a477338d058c, type: 3}
-  defaultWeapon: {fileID: 114010320187726130, guid: 7bcc56d6dcb118646898f62d05826358,
-    type: 2}
+  defaultMeleeWeapon: {fileID: 0}
+  defaultShootWeapon: {fileID: 0}
   weaponSocket: {fileID: 4269794221881166}
   health: 0
   stamina: 0

@@ -28,7 +28,7 @@ public class PlayerCharacter : Character
     protected virtual void OnAnimatorIK(int layerIndex) {
         if (isAiming) {
             anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-            anim.SetIKPosition(AvatarIKGoal.LeftHand, equippedWeapon.leftHandIK.position);
+            anim.SetIKPosition(AvatarIKGoal.LeftHand, equippedShootWeapon.leftHandIK.position);
         }
     }
 
@@ -49,7 +49,12 @@ public class PlayerCharacter : Character
         }
 
         if (Input.GetButtonDown("Fire1")) {
-            Fire(false);
+            if (isAiming) {
+                Fire(false);
+            } else {
+                anim.SetTrigger("Attack");
+            }
+
         }
 
         if (Input.GetKeyDown(KeyCode.Space)) {
@@ -61,7 +66,9 @@ public class PlayerCharacter : Character
         base.UpdateMovement();
         if (isAiming) {
             transform.LookAt(aimTarget.transform.position);
-            equippedWeapon.transform.parent.LookAt(aimTargetPos.position, Vector3.up);
+            equippedShootWeapon.transform.parent.LookAt(aimTargetPos.position, Vector3.up);
+        } else {
+            equippedShootWeapon.transform.parent.localRotation = Quaternion.Euler(0, 90, 90);
         }
     }
 
@@ -93,6 +100,13 @@ public class PlayerCharacter : Character
     }
 
     void UpdateAimTarget() {
+
+        if (!isAiming) {
+            aimTarget.SetActive(false);
+            return;
+        }
+
+        aimTarget.SetActive(true);
         if (!aimTarget) return;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

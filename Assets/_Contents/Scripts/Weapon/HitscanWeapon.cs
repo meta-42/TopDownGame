@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-public class HitscanWeapon : Weapon
+public class HitscanWeapon : ShootWeapon
 {
     public enum FireMode
     {
@@ -12,11 +12,6 @@ public class HitscanWeapon : Weapon
         //全自动
         FullAuto
     }
-
-
-
-    [SerializeField]
-    private RayImpact rayImpact;
 
     [SerializeField]
     private FireMode fireMode;
@@ -124,8 +119,10 @@ public class HitscanWeapon : Weapon
                 return;
             }
 
-            float impulse = rayImpact.GetImpulseAtDistance(hitInfo.distance, distanceMax);
-            float damage = rayImpact.GetDamageAtDistance(hitInfo.distance, distanceMax);
+            float impulse = hitImpact.GetImpulseAtDistance(hitInfo.distance, distanceMax);
+            float damage = hitImpact.GetDamageAtDistance(hitInfo.distance, distanceMax);
+            SpawnHitEffect(hitInfo);
+            SpawnHitSound(hitInfo);
             var damageable = hitInfo.collider.GetComponent<IDamageable>();
             if (damageable != null) {
                 var damageData = new DamageEventData(-damage, user, hitInfo.point, ray.direction, impulse);
@@ -142,4 +139,20 @@ public class HitscanWeapon : Weapon
         }
 
     }
+
+    protected void SpawnHitEffect(RaycastHit hit) {
+        var effect = hitImpact.GetHitEffect(hit);
+        if (effect) {
+            GameObject spawnedDecal = GameObject.Instantiate(effect, hit.point, Quaternion.LookRotation(hit.normal));
+            spawnedDecal.transform.SetParent(hit.collider.transform);
+        }
+    }
+
+    protected void SpawnHitSound(RaycastHit hit) {
+        var sound = hitImpact.GetHitSound(hit);
+        if (sound) {
+            AudioSource.PlayClipAtPoint(sound, hit.point);
+        }
+    }
+
 }

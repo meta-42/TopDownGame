@@ -31,7 +31,8 @@ public class DamageEventData {
 /// 处理伤害修正，冲击修正（根据距离）
 /// </summary>
 [Serializable]
-public class RayImpact {
+public class HitImpact {
+
     [Range(0f, 1000f)]
     [SerializeField]
     private float damageMax = 15f;
@@ -46,6 +47,82 @@ public class RayImpact {
         new Keyframe(0.8f, 0.5f),
         new Keyframe(1f, 0f));
 
+    [SerializeField]
+    public GameObject metalHitEffect;
+    [SerializeField]
+    public GameObject sandHitEffect;
+    [SerializeField]
+    public GameObject stoneHitEffect;
+    [SerializeField]
+    public GameObject waterLeakEffect;
+    [SerializeField]
+    public GameObject waterLeakExtinguishEffect;
+    [SerializeField]
+    public GameObject woodHitEffect;
+    [SerializeField]
+    public GameObject[] fleshHitEffects;
+
+
+    public AudioClip[] defaultHitSound;
+
+    public AudioClip GetHitSound(PhysicMaterial pm) {
+        if (pm != null) {
+            string materialName = pm.name;
+            switch (materialName) {
+                case "Metal":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+                case "Sand":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+                case "Stone":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+                case "WaterLeak":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+                case "Wood":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+                case "Meat":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+                case "Character":
+                    return defaultHitSound[UnityEngine.Random.Range(0, defaultHitSound.Length)];
+            }
+        }
+        return null;
+    }
+
+    public AudioClip GetHitSound(RaycastHit hit) {
+        return GetHitSound(hit.collider.sharedMaterial);
+    }
+
+
+    public GameObject GetHitEffect(PhysicMaterial pm) {
+        if (pm != null) {
+            string materialName = pm.name;
+            switch (materialName) {
+                case "Metal":
+                    return metalHitEffect;
+                case "Sand":
+                    return sandHitEffect;
+                case "Stone":
+                    return stoneHitEffect;
+                case "WaterLeak":
+                    return waterLeakEffect;
+                case "Wood":
+                    return woodHitEffect;
+                case "Meat":
+                    return fleshHitEffects[UnityEngine.Random.Range(0, fleshHitEffects.Length)];
+                case "Character":
+                    return fleshHitEffects[UnityEngine.Random.Range(0, fleshHitEffects.Length)];
+            }
+        }
+        return null;
+    }
+
+    public GameObject GetHitEffect(RaycastHit hit) {
+        return GetHitEffect(hit.collider.sharedMaterial);
+    }
+
+    public float GetDamage() {
+        return damageMax;
+    }
 
     public float GetDamageAtDistance(float distance, float maxDistance) {
         return ApplyCurveToValue(damageMax, distance, maxDistance);

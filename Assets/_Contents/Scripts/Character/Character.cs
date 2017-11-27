@@ -152,8 +152,8 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
 
         if (isCrouching || isAiming) velocity *= 0.5f;
-        velocity.y = rigid.velocity.y;
-        rigid.velocity = velocity;
+        //velocity.y = rigid.velocity.y;
+        //rigid.velocity = velocity;
     }
 
     void FixedUpdate() {
@@ -161,7 +161,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
             //anim.applyRootMotion = true;
         } else {
             //anim.applyRootMotion = false;
-            //rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
+            rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
 
         }
     }

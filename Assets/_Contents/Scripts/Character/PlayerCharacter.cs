@@ -52,7 +52,7 @@ public class PlayerCharacter : Character
             if (isAiming) {
                 Fire(false);
             } else {
-                anim.SetTrigger("Attack");
+                Melee();
             }
 
         }
@@ -65,10 +65,8 @@ public class PlayerCharacter : Character
     protected override void UpdateMovement() {
         base.UpdateMovement();
         if (isAiming) {
-            transform.LookAt(aimTarget.transform.position);
-            equippedShootWeapon.transform.parent.LookAt(aimTargetPos.position, Vector3.up);
-        } else {
-            equippedShootWeapon.transform.parent.localRotation = Quaternion.Euler(0, 90, 90);
+            transform.LookAt(aimTarget.transform.position, Vector3.up);
+            equippedShootWeapon.transform.parent.LookAt(aimTargetPos.transform.position, Vector3.up);
         }
     }
 

@@ -58,8 +58,7 @@ public class GameController : SingletonBehaviour<GameController>
 
         //加载初始场景并等待加载完成
         yield return StartCoroutine(LoadSceneAndSetActive(startScene));
-        
-        //==
+
         //加载完成，淡入
         StartCoroutine(fader.Fade(0f));
     }
@@ -86,9 +85,8 @@ public class GameController : SingletonBehaviour<GameController>
 
         yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 
-        //===
-        Scene newlyLoadedScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+        Scene newLoadedScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
 
-        SceneManager.SetActiveScene(newlyLoadedScene);
+        SceneManager.SetActiveScene(newLoadedScene);
     }
 }

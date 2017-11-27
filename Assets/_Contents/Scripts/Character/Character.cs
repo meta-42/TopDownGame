@@ -8,6 +8,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
 public abstract class Character : MonoBehaviour , IDamageable {
+
     public AudioClip dieSound;
 
     public MeleeWeapon defaultMeleeWeapon;
@@ -67,16 +68,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected AnimatorStateInfo leftArmInfo;
     protected AnimatorStateInfo fullBodyInfo;
 
-    public void SetActiveAttack(bool active) {
-
-        if (equippedMeleeWeapon != null) {
-            equippedMeleeWeapon.SetActiveDamage(active);
-        }
-    }
-
-    public void ResetAttack() {
-        anim.ResetTrigger("Attack");
-    }
 
     #region Cycle
 
@@ -110,12 +101,17 @@ public abstract class Character : MonoBehaviour , IDamageable {
         UpdateAnimator();
     }
 
+    protected virtual void FixedUpdate() {
+        if (InAnimatorStateWithTag("RootMotion")) return;
+
+        rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
+    }
+
     protected virtual void UpdateStatus() {
         CheckGround();
         StaminaRecovery();
         HealthRecovery();
     }
-
 
     protected virtual void UpdateWeapon() {
         if (equippedShootWeapon) {
@@ -152,18 +148,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
 
         if (isCrouching || isAiming) velocity *= 0.5f;
-        //velocity.y = rigid.velocity.y;
-        //rigid.velocity = velocity;
-    }
-
-    void FixedUpdate() {
-        if (InAnimatorStateWithTag("action")) {
-            //anim.applyRootMotion = true;
-        } else {
-            //anim.applyRootMotion = false;
-            rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
-
-        }
+        velocity.y = rigid.velocity.y;
     }
 
     protected virtual void UpdateAnimator()
@@ -183,25 +168,39 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     #region Public
 
+    public virtual void Melee() {
+
+        if (equippedMeleeWeapon == null) return;
+
+        anim.SetTrigger("Melee");
+    }
+
+    public virtual void SetActiveMelee(bool active) {
+
+        if (equippedMeleeWeapon != null) {
+            equippedMeleeWeapon.SetActiveDamage(active);
+        }
+    }
+
+
     public virtual bool Fire(bool continuously) {
         if (!isAiming) return false;
 
         if (equippedShootWeapon == null)
             return false;
 
-        bool attackWasSuccessful;
+        bool successful;
 
         if (continuously)
-            attackWasSuccessful = equippedShootWeapon.OnAttackContinuously();
+            successful = equippedShootWeapon.OnAttackContinuously();
         else
-            attackWasSuccessful = equippedShootWeapon.OnAttackOnce();
+            successful = equippedShootWeapon.OnAttackOnce();
 
-
-        if (attackWasSuccessful) {
+        if (successful) {
             anim.SetTrigger("Fire");
         }
 
-        return attackWasSuccessful;
+        return successful;
     }
 
     public virtual void EquipWeapon(Weapon Weapon, WeaponType type) {
@@ -302,7 +301,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
     }
 
     #endregion
-
 
     #region Private
 
@@ -430,7 +428,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     #endregion
 
-    #region Anim
+    #region Animation
 
     public int baseLayer { get { return anim.GetLayerIndex("Base Layer"); } }
     public int underBodyLayer { get { return anim.GetLayerIndex("Under Body"); } }
@@ -488,6 +486,5 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
         anim.MatchTarget(matchPosition, matchRotation, target, weightMask, normalisedStartTime, normalisedEndTime);
     }
-#endregion
-
+    #endregion
 }

@@ -12,6 +12,7 @@ public enum WeaponType {
 public abstract class Weapon : MonoBehaviour
 {
     public Transform leftHandIK;
+    public Transform rightHandIK;
 
     [HideInInspector]
     public WeaponType type;

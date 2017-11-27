@@ -9,6 +9,7 @@ public class PlayerHUD : MonoBehaviour {
 
     public ProgressBar health;
     public ProgressBar stamina;
+
     void Start () {
         tipsWin.SetActive(false);
         tipsLose.SetActive(false);

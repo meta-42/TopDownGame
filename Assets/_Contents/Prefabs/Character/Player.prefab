@@ -2420,14 +2420,14 @@ Rigidbody:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1883233784205378}
   serializedVersion: 2
-  m_Mass: 50
-  m_Drag: 0
+  m_Mass: 1
+  m_Drag: 3.39
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!81 &81265552967052162
 AudioListener:
   m_ObjectHideFlags: 1
@@ -2599,13 +2599,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dieSound: {fileID: 8300000, guid: 9b85f51bb1ef6854b964c6545419abab, type: 3}
-  defaultWeapon: {fileID: 114010320187726130, guid: 7bcc56d6dcb118646898f62d05826358,
+  defaultMeleeWeapon: {fileID: 114484862723495756, guid: ee8ee5156194e5143a5cc05751db686b,
+    type: 2}
+  defaultShootWeapon: {fileID: 114010320187726130, guid: 7bcc56d6dcb118646898f62d05826358,
     type: 2}
   weaponSocket: {fileID: 4203692513217664}
   health: 0
   stamina: 0
-  dashStamina: 30
-  aimingStamina: 30
   maxHealth: 100
   healthRecovery: 0
   maxStamina: 100
@@ -2614,9 +2614,11 @@ MonoBehaviour:
   currentHealthRecoveryDelay: 0
   speed: 4.7
   angularSpeed: 360
-  groundCheckDistance: 0.2
+  groundCheckDistance: 0.3
   defaultAimTarget: {fileID: 1544069153651374, guid: 6fc5bc00ce9d7bc4b9f6668c42830853,
     type: 2}
+  dashStamina: 30
+  dashDistance: 3
 --- !u!114 &114231685916369084
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2632,7 +2634,7 @@ MonoBehaviour:
   flow: {fileID: 224026648988433712}
   minValue: 0
   maxValue: 100
-  flowSpeed: 8
+  flowSpeed: 3
   value: 57.1
 --- !u!114 &114256078171650856
 MonoBehaviour:
@@ -2845,7 +2847,7 @@ MonoBehaviour:
   flow: {fileID: 224134599826638042}
   minValue: 0
   maxValue: 100
-  flowSpeed: 8
+  flowSpeed: 3
   value: 57.1
 --- !u!114 &114669753237031872
 MonoBehaviour:
@@ -3365,7 +3367,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1638015890141752}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -293, y: -175, z: 0}
+  m_LocalPosition: {x: 57, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224562601612657708}
@@ -3374,9 +3376,9 @@ RectTransform:
   m_Father: {fileID: 224156269576690820}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -293, y: -175}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 107, y: 51}
   m_SizeDelta: {x: 160, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224488832484064004
@@ -3514,7 +3516,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1259329464424388}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -7.36}
   m_LocalScale: {x: 0.9775, y: 0.9775, z: 0.9775}
   m_Children:
   - {fileID: 224156269576690820}
@@ -3551,7 +3553,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1413903375765804}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -293, y: -192, z: 0}
+  m_LocalPosition: {x: 57, y: -15.547287, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224488832484064004}
@@ -3560,8 +3562,8 @@ RectTransform:
   m_Father: {fileID: 224156269576690820}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -293, y: -192}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 107, y: 34.452713}
   m_SizeDelta: {x: 160, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}

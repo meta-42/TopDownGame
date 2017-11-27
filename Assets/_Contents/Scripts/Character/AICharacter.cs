@@ -24,11 +24,8 @@ public class AICharacter : Character {
             return;
         }
 
-
-
         if(agent.remainingDistance <= agent.stoppingDistance) {
             currentIndex = (currentIndex + 1) % points.Count;
-            //Debug.Log(currentIndex);
         }
     }
 
@@ -69,7 +66,4 @@ public class AICharacter : Character {
             agent.updateRotation = false;
         }
     }
-
-
-
 }

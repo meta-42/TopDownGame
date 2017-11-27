@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MeleeWeapon : Weapon {
-    [Header("Attack Settings")]
-    [Tooltip("攻击时的精力消耗")]
-    public float attackStaminaCost = 20;
-    [Tooltip("攻击后的精力恢复延迟")]
-    public float attackStaminaRecoveryDelay = 1;
 
     [Tooltip("配置此武器的所有HitBox")]
     public List<HitBox> hitBoxes;
 
     private Dictionary<HitBox, List<GameObject>> hitObjctCache;
+
     private bool canApplyDamage;
 
     public bool debugVisual;
@@ -47,18 +43,8 @@ public class MeleeWeapon : Weapon {
 
             hitObjctCache[hitBox].Add(other.gameObject);
 
-            var effect = hitImpact.GetHitEffect(other.sharedMaterial);
-
-            if (effect) {
-                var dir = (user.transform.position - other.transform.position).normalized;
-                GameObject spawnedDecal = GameObject.Instantiate(effect, other.transform.position, Quaternion.LookRotation(dir));
-                spawnedDecal.transform.SetParent(other.transform);
-            }
-
-            var sound = hitImpact.GetHitSound(other.sharedMaterial);
-            if (sound) {
-                AudioSource.PlayClipAtPoint(sound, other.transform.position);
-            }
+            SpawnHitEffect(other);
+            SpawnHitSound(other);
 
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null) {
@@ -66,7 +52,25 @@ public class MeleeWeapon : Weapon {
                 damageable.TakeDamage(damageData);
 
             }
+        }
+    }
 
+    protected void SpawnHitEffect(Collider other) {
+
+        var effect = hitImpact.GetHitEffect(other.sharedMaterial);
+
+        if (effect) {
+            var dir = (user.transform.position - other.transform.position).normalized;
+            GameObject spawnedDecal = GameObject.Instantiate(effect, other.transform.position, Quaternion.LookRotation(dir));
+            spawnedDecal.transform.SetParent(other.transform);
+        }
+    }
+
+    protected void SpawnHitSound(Collider other) {
+
+        var sound = hitImpact.GetHitSound(other.sharedMaterial);
+        if (sound) {
+            AudioSource.PlayClipAtPoint(sound, other.transform.position);
         }
     }
 }

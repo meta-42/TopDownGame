@@ -105,7 +105,7 @@ public class HitscanWeapon : ShootWeapon
             user.transform.position.z);
 
 
-        Ray ray = new Ray(firePos, user.transform.forward);
+        Ray ray = new Ray(firePos, transform.forward);
         Vector3 spreadVector = user.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
         ray.direction = Quaternion.Euler(spreadVector) * ray.direction;
 

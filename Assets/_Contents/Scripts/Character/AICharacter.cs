@@ -14,20 +14,6 @@ public class AICharacter : Character {
     public WaypointGroup waypointGroup;
     int currentIndex = 0;
 
-    void UpdatePatrol() {
-
-        var points = waypointGroup.waypoints;
-
-        var targetPos = points[currentIndex].transform.position;
-
-        if (!agent.SetDestination(targetPos)) {
-            return;
-        }
-
-        if(agent.remainingDistance <= agent.stoppingDistance) {
-            currentIndex = (currentIndex + 1) % points.Count;
-        }
-    }
 
     protected override void Start() {
         base.Start();
@@ -64,6 +50,22 @@ public class AICharacter : Character {
         {
             agent.updatePosition = false;
             agent.updateRotation = false;
+        }
+    }
+
+
+    void UpdatePatrol() {
+
+        var points = waypointGroup.waypoints;
+
+        var targetPos = points[currentIndex].transform.position;
+
+        if (!agent.SetDestination(targetPos)) {
+            return;
+        }
+
+        if (agent.remainingDistance <= agent.stoppingDistance) {
+            currentIndex = (currentIndex + 1) % points.Count;
         }
     }
 }

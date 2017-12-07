@@ -15,11 +15,15 @@ public class WaypointGroup : MonoBehaviour {
                 waypoints.Add(tr);
             }
         }
-  
+
+#if UNITY_EDITOR 
         foreach (var point in waypoints) {
-            EditorIconUtil.SetGameObjectIcon(point.gameObject, EditorBuiltinIcon.circleBlue);
+          EditorIconUtil.SetGameObjectIcon(point.gameObject, EditorBuiltinIcon.circleBlue);
         }
 
         EditorIconUtil.SetGameObjectIcon(gameObject, EditorBuiltinIcon.blue);
+#endif
     }
+
+
 }

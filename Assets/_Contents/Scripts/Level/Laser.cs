@@ -28,7 +28,7 @@ public class Laser : RayVisual {
     {
         if (hitInfo.collider.CompareTag(tagName))
         {
-            GameController.player.Die();
+            GameController.Instance.player.Die();
         }
     }
 

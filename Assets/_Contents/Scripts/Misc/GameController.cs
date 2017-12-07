@@ -13,11 +13,10 @@ public class GameController : SingletonBehaviour<GameController>
 
     public string startScene = "Game";
 
-  
     private AudioSource audioSource2D;
 
-    static PlayerCharacter _player;
-    public static PlayerCharacter player {
+    private PlayerCharacter _player;
+    public  PlayerCharacter player {
         get {
             if (_player == null)
                 _player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCharacter>();
@@ -25,8 +24,8 @@ public class GameController : SingletonBehaviour<GameController>
         }
     }
 
-    static Fader _fader;
-    public static Fader fader
+    Fader _fader;
+    public Fader fader
     {
         get
         {
@@ -54,13 +53,18 @@ public class GameController : SingletonBehaviour<GameController>
     }
 
     private IEnumerator Start() {
+
         audioSource2D = GetComponent<AudioSource>();
 
-        //加载初始场景并等待加载完成
-        yield return StartCoroutine(LoadSceneAndSetActive(startScene));
+        if (SceneManager.GetActiveScene().name == "Persistent") {
+            //加载初始场景并等待加载完成
+            yield return StartCoroutine(LoadSceneAndSetActive(startScene));
 
-        //加载完成，淡入
-        StartCoroutine(fader.Fade(0f));
+            //加载完成，淡入
+            StartCoroutine(fader.Fade(0f));
+
+            MainMenuPanel.Show();
+        }
     }
 
     private IEnumerator FadeAndSwitchScenes(string sceneName) {

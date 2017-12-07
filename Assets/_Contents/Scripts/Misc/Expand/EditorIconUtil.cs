@@ -1,8 +1,10 @@
-﻿using System;
+﻿#if UNITY_EDITOR 
+using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
+
 
 public static class EditorBuiltinIcon {
     public static string gray = "sv_label_0";
@@ -47,3 +49,4 @@ public static class EditorIconUtil {
         mi.Invoke(null, new object[] { go, iconContents[icon].image });
     }
 }
+#endif

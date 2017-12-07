@@ -9,5 +9,8 @@ EditorBuildSettings:
     path: Assets/_Contents/Persistent.unity
     guid: caa3aa2e3603e9b47aec5f7d7667011e
   - enabled: 1
+    path: Assets/_Contents/Scenes/MainMenu.unity
+    guid: 44984faa6c5a28f49b53f8d410d0bedd
+  - enabled: 1
     path: Assets/_Contents/Scenes/Game.unity
     guid: ccd21fdd48306a9449bcb999db7eecd9

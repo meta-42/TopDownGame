@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: ItemAtlas
+  m_EditorData:
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingParameters:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    packedHash:
+      serializedVersion: 2
+      Hash: 9e9f65250d309e4284902ff57ef40eca
+    variantMultiplier: 1
+    bindAsDefault: 1
+    finalFormat: 4
+    hashString: 9e9f65250d309e4284902ff57ef40eca
+    totalSpriteSurfaceArea: 39800
+    packables:
+    - {fileID: 21300038, guid: 0bd96f6f4899f644ea1ffd9b4735a5e6, type: 3}
+    - {fileID: 21300042, guid: 0bd96f6f4899f644ea1ffd9b4735a5e6, type: 3}
+    packedSpriteRenderDataKeys:
+    - 0bd96f6f4899f644ea1ffd9b4735a5e6: 21300042
+    - 0bd96f6f4899f644ea1ffd9b4735a5e6: 21300038
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300042, guid: 0bd96f6f4899f644ea1ffd9b4735a5e6, type: 3}
+  - {fileID: 21300038, guid: 0bd96f6f4899f644ea1ffd9b4735a5e6, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - OT Submachinegun 2
+  - OT Combat knife
+  m_Tag: ItemAtlas
+  m_IsVariant: 0

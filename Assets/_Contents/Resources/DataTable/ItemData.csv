@@ -1,0 +1,3 @@
+id,name,damage,icon,atlas
+10001,Sword,10,OT Combat knife,ItemAtlas
+10002,UMP-45,20,OT Submachinegun 2,ItemAtlas

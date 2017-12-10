@@ -1475,7 +1475,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1024932290583958}
   m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.17, y: -0.06300004, z: -0.08900007}
+  m_LocalPosition: {x: 0.124, y: -0.063, z: 0.027}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4696262635380866}
@@ -2410,10 +2410,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dieSound: {fileID: 8300000, guid: 9b85f51bb1ef6854b964c6545419abab, type: 3}
-  defaultMeleeWeapon: {fileID: 114484862723495756, guid: ee8ee5156194e5143a5cc05751db686b,
-    type: 2}
-  defaultShootWeapon: {fileID: 114010320187726130, guid: 7bcc56d6dcb118646898f62d05826358,
-    type: 2}
   weaponSocket: {fileID: 4203692513217664}
   health: 0
   stamina: 0
@@ -2423,9 +2419,10 @@ MonoBehaviour:
   staminaRecovery: 1.2
   currentStaminaRecoveryDelay: 0
   currentHealthRecoveryDelay: 0
-  speed: 4.7
+  speed: 3
   angularSpeed: 360
   groundCheckDistance: 0.3
+  defaultInventory: 1127000012270000
   defaultAimTarget: {fileID: 1544069153651374, guid: 6fc5bc00ce9d7bc4b9f6668c42830853,
     type: 2}
   dashStamina: 30
@@ -2946,7 +2943,7 @@ RectTransform:
   m_GameObject: {fileID: 1532437043478038}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -77.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.571, y: 1, z: 1}
+  m_LocalScale: {x: 0.57100016, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 224998188792599954}
   m_RootOrder: 1
@@ -2964,7 +2961,7 @@ RectTransform:
   m_GameObject: {fileID: 1979630150891514}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -77.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.571, y: 1, z: 1}
+  m_LocalScale: {x: 0.57100016, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 224209346564142448}
   m_RootOrder: 1
@@ -3076,7 +3073,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1259329464424388}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -8.4}
+  m_LocalPosition: {x: 0, y: 0, z: -6}
   m_LocalScale: {x: 0.9775, y: 0.9775, z: 0.9775}
   m_Children:
   - {fileID: 224156269576690820}

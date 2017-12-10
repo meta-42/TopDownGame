@@ -25,12 +25,12 @@ public class PlayerCharacter : Character
 
     }
 
-    protected virtual void OnAnimatorIK(int layerIndex) {
-        if (isAiming) {
-            anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-            anim.SetIKPosition(AvatarIKGoal.LeftHand, equippedShootWeapon.leftHandIK.position);
-        }
-    }
+    //protected virtual void OnAnimatorIK(int layerIndex) {
+    //    if (currentWeapon as ShootWeapon) {
+    //        anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+    //        anim.SetIKPosition(AvatarIKGoal.LeftHand, currentWeapon.leftHandIK.position);
+    //    }
+    //}
 
     protected override void UpdateControl() {
         base.UpdateControl();
@@ -42,32 +42,49 @@ public class PlayerCharacter : Character
         var move = v * Vector3.forward + h * Vector3.right;
         Movement(move);
         Crouching(Input.GetKey(KeyCode.C));
-        Aiming(Input.GetButton("Fire2"));
 
-        if (Input.GetButton("Fire1")) {
-            Fire(true);
-        }
 
-        if (Input.GetButtonDown("Fire1")) {
-            if (isAiming) {
-                Fire(false);
-            } else {
+        if (currentWeapon as MeleeWeapon) {
+            if (Input.GetButtonDown("Fire1")) {
                 Melee();
             }
+        }
 
+        if (currentWeapon as ShootWeapon) {
+            if (Input.GetButton("Fire1")) {
+                Fire(true);
+            }
+            if (Input.GetButtonDown("Fire1")) {
+                Fire(false);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Space)) {
             Dash();
         }
+
+        if (Input.GetAxis("Mouse ScrollWheel") < 0) {
+            EquipPrevWeapon();
+        }
+
+        if (Input.GetAxis("Mouse ScrollWheel") > 0) {
+            EquipNextWeapon();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab)) {
+            if (InventoryPanel.Get().gameObject.activeSelf) {
+                InventoryPanel.Hide();
+            }else {
+                InventoryPanel.Show();
+            }
+            
+            
+        }
     }
 
     protected override void UpdateMovement() {
         base.UpdateMovement();
-        if (isAiming) {
-            transform.LookAt(aimTarget.transform.position, Vector3.up);
-            equippedShootWeapon.transform.parent.LookAt(aimTargetPos.transform.position, Vector3.up);
-        }
+        transform.LookAt(aimTarget.transform.position, Vector3.up);
     }
 
     public override void Die()
@@ -77,7 +94,6 @@ public class PlayerCharacter : Character
     }
 
     void Dash() {
-        if (isAiming) return;
         if (stamina < dashStamina) return;
         if (moveRaw.magnitude <= 0) return;
 
@@ -98,12 +114,6 @@ public class PlayerCharacter : Character
     }
 
     void UpdateAimTarget() {
-
-        if (!isAiming) {
-            aimTarget.SetActive(false);
-            return;
-        }
-
         aimTarget.SetActive(true);
         if (!aimTarget) return;
 

@@ -11,9 +11,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     public AudioClip dieSound;
 
-    public MeleeWeapon defaultMeleeWeapon;
-    public ShootWeapon defaultShootWeapon;
-
     public Transform weaponSocket;
 
     public float health = 0f;
@@ -34,7 +31,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected bool isCrouching = false;
     protected bool isGrounded = false;
     protected bool isDead = false;
-    protected bool isAiming = false;
 
     [Range(0.1f,3)]
     [SerializeField]
@@ -58,8 +54,15 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected Vector3 groundNormal;
     protected float defaultCapsuleHeight;
     protected Vector3 defaultCapsuleCenter;
-    protected MeleeWeapon equippedMeleeWeapon;
-    protected ShootWeapon equippedShootWeapon;
+
+
+    protected Weapon currentWeapon;
+
+    public List<Weapon> inventory = new List<Weapon>();
+
+    [SerializeField]
+    int[] defaultInventory = null;
+
 
     protected AnimatorStateInfo baseLayerInfo;
     protected AnimatorStateInfo underBodyInfo;
@@ -84,7 +87,11 @@ public abstract class Character : MonoBehaviour , IDamageable {
         health = maxHealth;
         stamina = maxStamina;
 
-        SpawnDefaultWeapon();
+        SpawnDefaultInventory();
+    }
+
+    void OnDestroy() {
+        DestroyInventory();
     }
 
     protected virtual void Update()
@@ -96,7 +103,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
 
         UpdateStatus();
-        UpdateWeapon();
         UpdateMovement();
         UpdateAnimator();
     }
@@ -113,42 +119,20 @@ public abstract class Character : MonoBehaviour , IDamageable {
         HealthRecovery();
     }
 
-    protected virtual void UpdateWeapon() {
-        if (equippedShootWeapon) {
-            equippedShootWeapon.OnAiming(isAiming);
-
-        }
-        if (isAiming) {
-            if (equippedShootWeapon)
-                equippedShootWeapon.gameObject.SetActive(true);
-            if (equippedMeleeWeapon)
-                equippedMeleeWeapon.gameObject.SetActive(false);
-        } else {
-            if (equippedShootWeapon)
-                equippedShootWeapon.gameObject.SetActive(false);
-            if (equippedMeleeWeapon)
-                equippedMeleeWeapon.gameObject.SetActive(true);
-        }
-
-
-    }
-
     protected virtual void UpdateControl() { }
 
     protected virtual void UpdateMovement()
     {
-        if (isAiming)
-        {
-            velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
-        }
-        else
-        {
-            transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
-            velocity = transform.forward * forwardAmount * speed;
-        }
+        //transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
+        //velocity = transform.forward * forwardAmount * speed;
 
-        if (isCrouching || isAiming) velocity *= 0.5f;
+        velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
+
+        if (isCrouching) velocity *= 0.5f;
         velocity.y = rigid.velocity.y;
+    }
+    void LateUpdate() {
+        UpdateAnimator();
     }
 
     protected virtual void UpdateAnimator()
@@ -159,7 +143,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
         anim.SetFloat("Speed", velocity.magnitude, 0.01f, Time.deltaTime);
         anim.SetBool("Crouch", isCrouching);
         anim.SetBool("OnGround", isGrounded);
-        anim.SetBool("Aiming", isAiming);
+        anim.SetFloat("WeaponID", currentWeapon.id);
 
 
     }
@@ -170,31 +154,30 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     public virtual void Melee() {
 
-        if (equippedMeleeWeapon == null) return;
+        if (currentWeapon as MeleeWeapon == null) return; 
 
         anim.SetTrigger("Melee");
     }
 
     public virtual void SetActiveMelee(bool active) {
+        if (currentWeapon as MeleeWeapon == null) return;
 
-        if (equippedMeleeWeapon != null) {
-            equippedMeleeWeapon.SetActiveDamage(active);
-        }
+        (currentWeapon as MeleeWeapon).SetActiveDamage(active);
     }
 
 
     public virtual bool Fire(bool continuously) {
-        if (!isAiming) return false;
+        var weapon = (currentWeapon as ShootWeapon);
 
-        if (equippedShootWeapon == null)
+        if (weapon == null)
             return false;
 
         bool successful;
 
         if (continuously)
-            successful = equippedShootWeapon.OnAttackContinuously();
+            successful = weapon.OnAttackContinuously();
         else
-            successful = equippedShootWeapon.OnAttackOnce();
+            successful = weapon.OnAttackOnce();
 
         if (successful) {
             anim.SetTrigger("Fire");
@@ -203,29 +186,32 @@ public abstract class Character : MonoBehaviour , IDamageable {
         return successful;
     }
 
-    public virtual void EquipWeapon(Weapon Weapon, WeaponType type) {
-        if (!Weapon) return;
-
-        if (type == WeaponType.Shoot) {
-            SetCurrentWeapon(Weapon, equippedShootWeapon, WeaponType.Shoot);
-        } else if (type == WeaponType.Melee) {
-            SetCurrentWeapon(Weapon, equippedMeleeWeapon, WeaponType.Melee);
+    public void EquipNextWeapon() {
+        if(inventory.Count >= 2) {
+            var currentIndex = inventory.IndexOf(currentWeapon);
+            var nextIndex = (currentIndex + 1) % inventory.Count;
+            var nextWeapon = inventory[nextIndex];
+            EquipWeapon(nextWeapon);
         }
     }
 
-    public virtual void UnEquipWeapon(Weapon Weapon, WeaponType type) {
-        if (!Weapon) return;
+    public void EquipPrevWeapon() {
+        if (inventory.Count >= 2) {
+            var currentIndex = inventory.IndexOf(currentWeapon);
+            var prevIndex = (currentIndex - 1 + inventory.Count) % inventory.Count;
+            var prevWeapon = inventory[prevIndex];
+            EquipWeapon(prevWeapon);
+        }
+    }
 
-        if (type == WeaponType.Shoot) {
+    public virtual void EquipWeapon(Weapon newWeapon) {
+        if (!newWeapon) return;
+        SetCurrentWeapon(newWeapon, currentWeapon);
+    }
 
-            if (Weapon != equippedShootWeapon) return;
-            SetCurrentWeapon(null, Weapon, WeaponType.Shoot);
-
-        } else if (type == WeaponType.Melee) {
-
-            if (Weapon != equippedMeleeWeapon) return;
-            SetCurrentWeapon(null, Weapon, WeaponType.Melee);
-
+    public virtual void UnEquipWeapon(Weapon newWeapon) {
+        if (newWeapon && newWeapon == currentWeapon) {
+            SetCurrentWeapon(null, newWeapon);
         }
     }
 
@@ -248,7 +234,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     }
 
     public virtual void Crouching(bool crouch) {
-        if (isGrounded && !isAiming && crouch ) {
+        if (isGrounded && crouch ) {
             if (isCrouching) return;
             capsule.height = capsule.height / 2f;
             capsule.center = capsule.center / 2f;
@@ -264,14 +250,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
             capsule.height = defaultCapsuleHeight;
             capsule.center = defaultCapsuleCenter;
             isCrouching = false;
-        }
-    }
-
-    public virtual void Aiming(bool aiming) {
-        if (isGrounded && !isCrouching && aiming) {
-            isAiming = true;
-        } else {
-            isAiming = false;
         }
     }
 
@@ -318,53 +296,74 @@ public abstract class Character : MonoBehaviour , IDamageable {
         }
     }
 
-    void SpawnDefaultWeapon()
-    {
-        if (defaultShootWeapon)
-        {
-            Weapon NewWeapon = Instantiate(defaultShootWeapon, weaponSocket.position, weaponSocket.rotation);
-            NewWeapon.transform.parent = weaponSocket.transform;
-            EquipWeapon(NewWeapon, WeaponType.Shoot);
+    void AddWeaponToInventory(Weapon weapon) {
+
+        if (!weapon) return;
+
+        inventory.Add(weapon);
+        weapon.OnEnterInventory(this);
+        if (InventoryPanel.Get()) {
+            InventoryPanel.Get().RefreshEquipInventory();
+        }
+    }
+
+    void RemoveWeaponFromInventory(Weapon weapon) {
+
+        if (!weapon) return;
+
+        inventory.Remove(weapon);
+        weapon.OnLeaveInventory();
+
+        if (InventoryPanel.Get()) {
+            InventoryPanel.Get().RefreshEquipInventory();
         }
 
-        if (defaultMeleeWeapon) {
-            Weapon NewWeapon = Instantiate(defaultMeleeWeapon, weaponSocket.position, weaponSocket.rotation);
+    }
+
+    void DestroyInventory() {
+        for (int i=0; i < inventory.Count; i++) {
+            var item = inventory[i];
+            if (!item) continue;
+            RemoveWeaponFromInventory(item);
+            Destroy(item);
+        }
+    }
+
+    void SpawnDefaultInventory()
+    {
+        foreach(var id in defaultInventory) {
+            var itemData = DataTable.Get<ItemData>(id);
+            var item = Resources.Load<Weapon>("Weapon/" + itemData.name);
+            if (!item) return;
+            Weapon NewWeapon = Instantiate(item, weaponSocket.position, weaponSocket.rotation);
             NewWeapon.transform.parent = weaponSocket.transform;
-            EquipWeapon(NewWeapon, WeaponType.Melee);
+            AddWeaponToInventory(NewWeapon);
+        }
+
+        if(inventory.Count > 0) {
+            EquipWeapon(inventory[0]);
         }
     }
 
 
-    void SetCurrentWeapon(Weapon newWeapon, Weapon lastWeapon, WeaponType type) {
+    void SetCurrentWeapon(Weapon newWeapon, Weapon lastWeapon) {
         Weapon LocalLastWeapon = null;
-        if (type == WeaponType.Shoot) {
 
-            if (lastWeapon != null) {
-                LocalLastWeapon = lastWeapon;
-            } else if (newWeapon != equippedShootWeapon) {
-                LocalLastWeapon = equippedShootWeapon;
-            }
+        if (lastWeapon != null) {
 
-            if (LocalLastWeapon) LocalLastWeapon.OnUnEquip();
+            LocalLastWeapon = lastWeapon;
 
-            equippedShootWeapon = newWeapon as ShootWeapon;
+        } else if (newWeapon != currentWeapon) {
 
-            if (newWeapon) newWeapon.OnEquip();
+            LocalLastWeapon = currentWeapon;
 
-        } else if (type == WeaponType.Melee) {
-
-            if (lastWeapon != null) {
-                LocalLastWeapon = lastWeapon;
-            } else if (newWeapon != equippedMeleeWeapon) {
-                LocalLastWeapon = equippedMeleeWeapon;
-            }
-
-            if (LocalLastWeapon) LocalLastWeapon.OnUnEquip();
-
-            equippedMeleeWeapon = newWeapon as MeleeWeapon;
-
-            if (newWeapon) newWeapon.OnEquip();
         }
+
+        if (LocalLastWeapon) LocalLastWeapon.OnUnEquip();
+
+        currentWeapon = newWeapon;
+
+        if (newWeapon) newWeapon.OnEquip();
 
     }
 

@@ -100,22 +100,22 @@ public class HitscanWeapon : ShootWeapon
         float spread = spreadAim;
         RaycastHit hitInfo;
 
-        var firePos = new Vector3(user.transform.position.x,
-            user.transform.position.y + user.GetComponent<CapsuleCollider>().height / 2,
-            user.transform.position.z);
+        var firePos = new Vector3(owner.transform.position.x,
+            owner.transform.position.y + owner.GetComponent<CapsuleCollider>().height / 2,
+            owner.transform.position.z);
 
 
         Ray ray = new Ray(firePos, transform.forward);
-        Vector3 spreadVector = user.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
+        Vector3 spreadVector = owner.transform.TransformVector(new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), 0f));
         ray.direction = Quaternion.Euler(spreadVector) * ray.direction;
 
         if (debugVisual) {
-            Debug.DrawLine(firePos, firePos + user.transform.forward * distanceMax, Color.red, 1100);
+            Debug.DrawLine(firePos, firePos + owner.transform.forward * distanceMax, Color.red, 1100);
 
         }
 
         if (Physics.Raycast(ray, out hitInfo, distanceMax, damageMask, QueryTriggerInteraction.Ignore)) {
-            if (hitInfo.collider.gameObject == user) {
+            if (hitInfo.collider.gameObject == owner) {
                 return;
             }
 
@@ -125,7 +125,7 @@ public class HitscanWeapon : ShootWeapon
             SpawnHitSound(hitInfo);
             var damageable = hitInfo.collider.GetComponent<IDamageable>();
             if (damageable != null) {
-                var damageData = new DamageEventData(-damage, user, hitInfo.point, ray.direction, impulse);
+                var damageData = new DamageEventData(-damage, owner, hitInfo.point, ray.direction, impulse);
                 damageable.TakeDamage(damageData);
             } else if (hitInfo.rigidbody) {
                 hitInfo.rigidbody.AddForceAtPosition(ray.direction * impulse, hitInfo.point, ForceMode.Impulse);

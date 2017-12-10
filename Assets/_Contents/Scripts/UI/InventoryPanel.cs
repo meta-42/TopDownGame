@@ -6,7 +6,7 @@ using UnityEngine.U2D;
 
 
 
-public class InventoryPanel : MonoBehaviour {
+public class InventoryPanel : UIPanel<InventoryPanel> {
 
     public Transform barkpackContent;
 
@@ -14,9 +14,21 @@ public class InventoryPanel : MonoBehaviour {
 
     public Transform itemTemplate;
 
+    public Image[] equipSolt;
+
+    public void RefreshEquipInventory() {
+        var inventory = GameController.Instance.player.inventory;
+
+        for(int i = 0; i < inventory.Count; i++) {
+            var item = DataTable.Get<ItemData>(inventory[i].id);
+            var atlas = Resources.Load<SpriteAtlas>("Icon/" + item.atlas);
+            var sprite = atlas.GetSprite(item.icon);
+            equipSolt[i].sprite = sprite;
+        }
+    }
 
     void Start () {
-
+        Hide();
         itemTemplate.gameObject.SetActive(false);
         barkpackItems = new ItemData[2];
         barkpackItems[0] = DataTable.Get<ItemData>(10001);

@@ -24,4 +24,10 @@ public class UIPanel<T> : MonoBehaviour where T: Component  {
         ins.SetActive(false);
     }
 
+    public static T Get() {
+        if (_ins) {
+            return _ins.GetComponent<T>();
+        }
+        return null;
+    }
 }

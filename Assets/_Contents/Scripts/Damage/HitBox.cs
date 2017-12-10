@@ -11,7 +11,7 @@ public class HitBox : MonoBehaviour {
     public Collider trigger;
 
     bool CheckTrigger(Collider other) {
-        return ((weapon != null && (weapon.user == null || other.gameObject != weapon.user.gameObject)));
+        return ((weapon != null && (weapon.owner == null || other.gameObject != weapon.owner.gameObject)));
     }
 
     void Start() {

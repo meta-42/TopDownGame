@@ -39,7 +39,7 @@ public class MeleeWeapon : Weapon {
     public virtual void OnHit(HitBox hitBox, Collider other) {
         if (canApplyDamage && 
             !hitObjctCache[hitBox].Contains(other.gameObject) &&
-            (user != null && other.gameObject != user.gameObject)) {
+            (owner != null && other.gameObject != owner.gameObject)) {
 
             hitObjctCache[hitBox].Add(other.gameObject);
 
@@ -48,7 +48,7 @@ public class MeleeWeapon : Weapon {
 
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null) {
-                var damageData = new DamageEventData(-hitImpact.GetDamage(), user);
+                var damageData = new DamageEventData(-hitImpact.GetDamage(), owner);
                 damageable.TakeDamage(damageData);
 
             }
@@ -60,7 +60,7 @@ public class MeleeWeapon : Weapon {
         var effect = hitImpact.GetHitEffect(other.sharedMaterial);
 
         if (effect) {
-            var dir = (user.transform.position - other.transform.position).normalized;
+            var dir = (owner.transform.position - other.transform.position).normalized;
             GameObject spawnedDecal = GameObject.Instantiate(effect, other.transform.position, Quaternion.LookRotation(dir));
             spawnedDecal.transform.SetParent(other.transform);
         }

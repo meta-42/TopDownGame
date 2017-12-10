@@ -3,48 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public enum WeaponType {
-    Melee,
-    Shoot,
-}
-
-
 public abstract class Weapon : MonoBehaviour
 {
+
     public Transform leftHandIK;
     public Transform rightHandIK;
-
-    [HideInInspector]
-    public WeaponType type;
-
+    public int id;
     [SerializeField]
     protected HitImpact hitImpact;
 
+    protected ItemData data;
 
-    private Character _user;
-    public Character user
-    {
-        get
-        {
-            if (_user == null)
-                _user = GetComponent<Character>();
-            if (!_user)
-                _user = GetComponentInParent<Character>();
-            return _user;
-        }
-    }
+    public Character owner { get; private set; }
 
     public bool isEquiped { get; private set; }
+
+    void Awake() {
+        data = DataTable.Get<ItemData>(id);
+    }
 
     public virtual void OnEquip()
     {
         isEquiped = true;
+        gameObject.SetActive(true);
     }
 
     public virtual void OnUnEquip()
     {
         isEquiped = false;
+        gameObject.SetActive(false);
     }
 
+    public void OnEnterInventory(Character newOwner) {
+        if(owner != newOwner) {
+            owner = newOwner;
+            gameObject.SetActive(false);
+        }
+    }
+
+    public void OnLeaveInventory() {
+        owner = null;
+        gameObject.SetActive(true);
+    }
 
 }

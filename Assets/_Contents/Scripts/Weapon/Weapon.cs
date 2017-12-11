@@ -12,12 +12,12 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField]
     protected HitImpact hitImpact;
 
-    protected ItemData data;
+    public ItemData data;
 
     public Character owner { get; private set; }
 
     public bool isEquiped { get; private set; }
-
+    public bool isInInventory { get; private set; }
     void Awake() {
         data = DataTable.Get<ItemData>(id);
     }
@@ -38,12 +38,16 @@ public abstract class Weapon : MonoBehaviour
         if(owner != newOwner) {
             owner = newOwner;
             gameObject.SetActive(false);
+            isInInventory = true;
+            GetComponent<Collider>().enabled = false;
         }
     }
 
     public void OnLeaveInventory() {
         owner = null;
         gameObject.SetActive(true);
+        isInInventory = false;
+        GetComponent<Collider>().enabled = true;
     }
 
 }

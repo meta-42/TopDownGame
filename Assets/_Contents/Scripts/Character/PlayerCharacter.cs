@@ -63,22 +63,23 @@ public class PlayerCharacter : Character
             Dash();
         }
 
-        if (Input.GetAxis("Mouse ScrollWheel") < 0) {
+
+        if (Input.GetAxisRaw("Mouse ScrollWheel") < -0.1) {
             EquipPrevWeapon();
         }
 
-        if (Input.GetAxis("Mouse ScrollWheel") > 0) {
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0.1) {
             EquipNextWeapon();
         }
 
         if (Input.GetKeyDown(KeyCode.Tab)) {
-            if (InventoryPanel.Get().gameObject.activeSelf) {
-                InventoryPanel.Hide();
-            }else {
+            if (InventoryPanel.Get() != null && !InventoryPanel.Get().gameObject.activeSelf) {
                 InventoryPanel.Show();
-            }
-            
-            
+                Cursor.visible = true;
+            } else {
+                InventoryPanel.Hide();
+                Cursor.visible = false;
+            } 
         }
     }
 

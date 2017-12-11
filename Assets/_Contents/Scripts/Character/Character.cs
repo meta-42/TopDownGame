@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.AI;
+using System;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
@@ -54,6 +55,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected Vector3 groundNormal;
     protected float defaultCapsuleHeight;
     protected Vector3 defaultCapsuleCenter;
+    protected bool canControl = true;
 
 
     protected Weapon currentWeapon;
@@ -96,7 +98,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     protected virtual void Update()
     {
-        if (!isDead)
+        if (!isDead && canControl)
         {
             UpdateControl();
         }
@@ -335,9 +337,15 @@ public abstract class Character : MonoBehaviour , IDamageable {
             var itemData = DataTable.Get<ItemData>(id);
             var item = Resources.Load<Weapon>("Weapon/" + itemData.name);
             if (!item) return;
-            Weapon NewWeapon = Instantiate(item, weaponSocket.position, weaponSocket.rotation);
-            NewWeapon.transform.parent = weaponSocket.transform;
-            AddWeaponToInventory(NewWeapon);
+            Transform socket = null;
+            if (item as ShootWeapon) {
+                socket = weaponSocket.Find("ShootSocket");
+            } else if(item as MeleeWeapon) {
+                socket = weaponSocket.Find("MeleeSocket");
+            }
+            Weapon newWeapon = Instantiate(item, socket.position, socket.rotation);
+            newWeapon.transform.parent = socket.transform;
+            AddWeaponToInventory(newWeapon);
         }
 
         if(inventory.Count > 0) {

@@ -8,13 +8,14 @@ using UnityEngine.U2D;
 
 public class InventoryPanel : UIPanel<InventoryPanel> {
 
-    public Transform barkpackContent;
-
-    public ItemData[] barkpackItems;
+    public Transform aroundContent;
 
     public Transform itemTemplate;
 
-    public Image[] equipSolt;
+    public Image[] inventorySolt;
+
+    public List<Transform> aroundItems = new List<Transform>();
+
 
     public void RefreshEquipInventory() {
         var inventory = GameController.Instance.player.inventory;
@@ -23,26 +24,34 @@ public class InventoryPanel : UIPanel<InventoryPanel> {
             var item = DataTable.Get<ItemData>(inventory[i].id);
             var atlas = Resources.Load<SpriteAtlas>("Icon/" + item.atlas);
             var sprite = atlas.GetSprite(item.icon);
-            equipSolt[i].sprite = sprite;
+            inventorySolt[i].sprite = sprite;
         }
     }
 
     void Start () {
         Hide();
         itemTemplate.gameObject.SetActive(false);
-        barkpackItems = new ItemData[2];
-        barkpackItems[0] = DataTable.Get<ItemData>(10001);
-        barkpackItems[1] = DataTable.Get<ItemData>(10002);
-        
-        foreach (var data in barkpackItems) {
-            var item = Instantiate(itemTemplate);
-            item.GetComponentInChildren<Text>().text = data.name;
-            var atlas = Resources.Load<SpriteAtlas>("Icon/" + data.atlas);
-            item.GetChild(0).GetComponent<Image>().sprite = atlas.GetSprite(data.icon);
-            item.transform.SetParent(barkpackContent);
-            item.gameObject.SetActive(true);
-        }
+    }
 
+    private void Update() {
+        for (int i = 0; i < aroundContent.childCount; i++) {
+            Destroy(aroundContent.GetChild(i).gameObject);
+        }
+        var player = GameController.Instance.player;
+        var rets = Physics.OverlapSphere(player.transform.position, 2);
+
+        foreach(var ret in rets) {
+            var weapon = ret.GetComponent<Weapon>();
+            if (weapon && !weapon.isInInventory) {
+                var item = Instantiate(itemTemplate);
+
+                item.GetComponentInChildren<Text>().text = weapon.data.name;
+                var atlas = Resources.Load<SpriteAtlas>("Icon/" + weapon.data.atlas);
+                item.GetChild(0).GetComponent<Image>().sprite = atlas.GetSprite(weapon.data.icon);
+                item.transform.SetParent(aroundContent);
+                item.gameObject.SetActive(true);
+            }
+        }
     }
 
 }

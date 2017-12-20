@@ -33,7 +33,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected bool isGrounded = false;
     protected bool isDead = false;
 
-    [Range(0.1f,3)]
+    [Range(0.1f,10)]
     [SerializeField]
     protected float speed = 3;
 
@@ -133,9 +133,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
         if (isCrouching) velocity *= 0.5f;
         velocity.y = rigid.velocity.y;
     }
-    void LateUpdate() {
-        UpdateAnimator();
-    }
 
     protected virtual void UpdateAnimator()
     {
@@ -146,7 +143,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
         anim.SetBool("Crouch", isCrouching);
         anim.SetBool("OnGround", isGrounded);
         anim.SetFloat("WeaponID", currentWeapon.id);
-
+        anim.SetBool("Aiming",(currentWeapon as ShootWeapon) != null);
 
     }
 

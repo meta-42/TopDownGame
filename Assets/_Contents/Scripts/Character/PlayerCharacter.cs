@@ -25,13 +25,6 @@ public class PlayerCharacter : Character
 
     }
 
-    //protected virtual void OnAnimatorIK(int layerIndex) {
-    //    if (currentWeapon as ShootWeapon) {
-    //        anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-    //        anim.SetIKPosition(AvatarIKGoal.LeftHand, currentWeapon.leftHandIK.position);
-    //    }
-    //}
-
     protected override void UpdateControl() {
         base.UpdateControl();
 
@@ -41,8 +34,6 @@ public class PlayerCharacter : Character
         float v = Input.GetAxis("Vertical");
         var move = v * Vector3.forward + h * Vector3.right;
         Movement(move);
-        Crouching(Input.GetKey(KeyCode.C));
-
 
         if (currentWeapon as MeleeWeapon) {
             if (Input.GetButtonDown("Fire1")) {
@@ -59,18 +50,16 @@ public class PlayerCharacter : Character
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            Dash();
+        if(!InAnimatorStateWithTag("Attack")){
+            if (Input.GetAxis("Mouse ScrollWheel") < -0.1) {
+                EquipPrevWeapon();
+            }
+
+            if (Input.GetAxis("Mouse ScrollWheel") > 0.1) {
+                EquipNextWeapon();
+            }
         }
 
-
-        if (Input.GetAxisRaw("Mouse ScrollWheel") < -0.1) {
-            EquipPrevWeapon();
-        }
-
-        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0.1) {
-            EquipNextWeapon();
-        }
 
         if (Input.GetKeyDown(KeyCode.Tab)) {
             if (InventoryPanel.Get() != null && !InventoryPanel.Get().gameObject.activeSelf) {
@@ -92,18 +81,6 @@ public class PlayerCharacter : Character
     {
         base.Die();
         StartCoroutine(OnRestartLevel());
-    }
-
-    void Dash() {
-        if (stamina < dashStamina) return;
-        if (moveRaw.magnitude <= 0) return;
-
-        currentStaminaRecoveryDelay = 1f;
-        ReduceStamina(dashStamina, false);
-
-        Vector3 dashVelocity = Vector3.Scale(moveRaw, dashDistance * new Vector3((Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime), 0, (Mathf.Log(1f / (Time.deltaTime * rigid.drag + 1)) / -Time.deltaTime)));
-        rigid.AddForce(dashVelocity, ForceMode.VelocityChange);
-        anim.Play("Dash");
     }
 
     void SpawnDefaultAimTarget() {

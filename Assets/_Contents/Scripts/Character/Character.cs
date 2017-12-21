@@ -10,6 +10,7 @@ using System;
 [RequireComponent(typeof(Animator))]
 public abstract class Character : MonoBehaviour , IDamageable {
 
+
     public AudioClip dieSound;
 
     public Transform weaponSocket;
@@ -32,6 +33,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected bool isCrouching = false;
     protected bool isGrounded = false;
     protected bool isDead = false;
+    public bool isPlayer = false;
 
     [Range(0.1f,10)]
     [SerializeField]
@@ -78,6 +80,11 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     protected virtual void Start()
     {
+        if(this.GetType() == typeof(PlayerCharacter)){
+            isPlayer = true;
+        }else{
+            isPlayer = false;
+        }
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
@@ -111,7 +118,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     protected virtual void FixedUpdate() {
         if (InAnimatorStateWithTag("RootMotion")) return;
-
+        if (!isPlayer) return;
         rigid.MovePosition(rigid.position + velocity * Time.fixedDeltaTime);
     }
 
@@ -138,11 +145,8 @@ public abstract class Character : MonoBehaviour , IDamageable {
     {
         anim.SetFloat("Forward", forwardAmount, 0.01f, Time.deltaTime);
         anim.SetFloat("Right", rightAmount, 0.01f, Time.deltaTime);
-        anim.SetFloat("Turn", turnAmount, 0.1f, Time.deltaTime);
         anim.SetFloat("Speed", velocity.magnitude, 0.01f, Time.deltaTime);
-        anim.SetBool("Crouch", isCrouching);
         anim.SetBool("OnGround", isGrounded);
-        anim.SetFloat("WeaponID", currentWeapon.id);
         anim.SetBool("Aiming",(currentWeapon as ShootWeapon) != null);
 
     }
@@ -230,26 +234,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
         rightAmount = move.x;
         forwardAmount = move.z;
 
-    }
-
-    public virtual void Crouching(bool crouch) {
-        if (isGrounded && crouch ) {
-            if (isCrouching) return;
-            capsule.height = capsule.height / 2f;
-            capsule.center = capsule.center / 2f;
-            isCrouching = true;
-        } else {
-            //限制头顶有遮挡时，必须蹲下
-            Ray crouchRay = new Ray(rigid.position + Vector3.up * capsule.radius * 0.5f, Vector3.up);
-            float crouchRayLength = defaultCapsuleHeight - capsule.radius * 0.5f;
-            if (Physics.SphereCast(crouchRay, capsule.radius * 0.5f, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore)) {
-                isCrouching = true;
-                return;
-            }
-            capsule.height = defaultCapsuleHeight;
-            capsule.center = defaultCapsuleCenter;
-            isCrouching = false;
-        }
     }
 
     public virtual void Die() {
@@ -451,7 +435,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
         upperBodyInfo = anim.GetCurrentAnimatorStateInfo(upperBodyLayer);
         fullBodyInfo = anim.GetCurrentAnimatorStateInfo(fullbodyLayer);
     }
-
+    
     public bool InAnimatorStateWithTag(string tag)
     {
         if (anim == null) return false;

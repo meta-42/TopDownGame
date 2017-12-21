@@ -25,8 +25,6 @@ public class HitscanWeapon : ShootWeapon
     [SerializeField]
     private GameObject tracer;
 
-    [SerializeField]
-    private GameObject infrared;
 
     [SerializeField]
     [Range(0f, 30f)]
@@ -53,7 +51,6 @@ public class HitscanWeapon : ShootWeapon
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        infrared.SetActive(false);
         if (fireMode == FireMode.SemiAuto)
             timeBetweenShotsMin = shotDuration;
         else
@@ -78,15 +75,6 @@ public class HitscanWeapon : ShootWeapon
             return false;
 
         return OnAttackOnce();
-    }
-
-    public override void OnAiming(bool isAiming)
-    {
-        if (isAiming) {
-            infrared.SetActive(true);
-        } else {
-            infrared.SetActive(false);
-        }
     }
 
     protected void Shoot()

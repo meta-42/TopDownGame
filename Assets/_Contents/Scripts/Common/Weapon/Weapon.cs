@@ -4,20 +4,16 @@ using UnityEngine;
 using System;
 
 public abstract class Weapon : MonoBehaviour
-{
-
-    public Transform leftHandIK;
-    public Transform rightHandIK;
-    public int id;
+{    
     [SerializeField]
     protected HitImpact hitImpact;
 
+    public int id;
     public ItemData data;
-
     public Character owner { get; private set; }
-
     public bool isEquiped { get; private set; }
     public bool isInInventory { get; private set; }
+
     void Awake() {
         data = DataTable.Get<ItemData>(id);
     }
@@ -40,6 +36,7 @@ public abstract class Weapon : MonoBehaviour
             gameObject.SetActive(false);
             isInInventory = true;
             GetComponent<Collider>().enabled = false;
+            GetComponent<Rigidbody>().isKinematic = true;
         }
     }
 
@@ -48,6 +45,7 @@ public abstract class Weapon : MonoBehaviour
         gameObject.SetActive(true);
         isInInventory = false;
         GetComponent<Collider>().enabled = true;
+        GetComponent<Rigidbody>().isKinematic = false;
     }
 
 }

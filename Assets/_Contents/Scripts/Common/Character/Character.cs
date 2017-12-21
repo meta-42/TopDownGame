@@ -9,43 +9,30 @@ using System;
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Animator))]
 public abstract class Character : MonoBehaviour , IDamageable {
-
-
-    public AudioClip dieSound;
-
-    public Transform weaponSocket;
+    
+    [SerializeField]
+    protected Transform weaponSocket;
+    [SerializeField]
+    protected float speed = 3;
+    [SerializeField]
+    protected float angularSpeed = 360;
+    [SerializeField]
+    protected float groundCheckDistance = 0.2f;
+    [SerializeField]
+    int[] defaultInventory = null;
 
     public float health = 0f;
     public float stamina = 0f;
-
-
     public float maxHealth = 100f;
     public float healthRecovery = 0f;
     public float maxStamina = 200f;
     public float staminaRecovery = 1.2f;
+    public List<Weapon> inventory = new List<Weapon>();
 
-    [HideInInspector]
-    public float currentStaminaRecoveryDelay;
-    [HideInInspector]
-    public float currentHealthRecoveryDelay;
-
-    //状态
-    protected bool isCrouching = false;
+    protected float currentStaminaRecoveryDelay;
+    protected float currentHealthRecoveryDelay;
     protected bool isGrounded = false;
     protected bool isDead = false;
-    public bool isPlayer = false;
-
-    [Range(0.1f,10)]
-    [SerializeField]
-    protected float speed = 3;
-
-    [Range(1f, 1000)]
-    [SerializeField]
-    protected float angularSpeed = 360;
-
-    [SerializeField]
-    protected float groundCheckDistance = 0.2f;
-
     protected Rigidbody rigid;
     protected Animator anim;
     protected CapsuleCollider capsule;
@@ -55,41 +42,37 @@ public abstract class Character : MonoBehaviour , IDamageable {
     protected Vector3 velocity;
     protected Vector3 moveRaw;
     protected Vector3 groundNormal;
-    protected float defaultCapsuleHeight;
-    protected Vector3 defaultCapsuleCenter;
-    protected bool canControl = true;
-
-
     protected Weapon currentWeapon;
 
-    public List<Weapon> inventory = new List<Weapon>();
 
-    [SerializeField]
-    int[] defaultInventory = null;
+    #region Property
+    public bool isPlayer {
+        get{
+            if(this.GetType() == typeof(PlayerCharacter)){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
 
+    public int baseLayer { get { return anim.GetLayerIndex("Base Layer"); } }
+    public int underBodyLayer { get { return anim.GetLayerIndex("Under Body"); } }
+    public int rightArmLayer { get { return anim.GetLayerIndex("Right Arm"); } }
+    public int leftArmLayer { get { return anim.GetLayerIndex("Left Arm"); } }
+    public int upperBodyLayer { get { return anim.GetLayerIndex("Upper Body"); } }
+    public int fullbodyLayer { get { return anim.GetLayerIndex("Full Body"); } }
 
-    protected AnimatorStateInfo baseLayerInfo;
-    protected AnimatorStateInfo underBodyInfo;
-    protected AnimatorStateInfo upperBodyInfo;
-    protected AnimatorStateInfo rightArmInfo;
-    protected AnimatorStateInfo leftArmInfo;
-    protected AnimatorStateInfo fullBodyInfo;
+    #endregion
 
-
-    #region Cycle
+    #region Base
 
     protected virtual void Start()
     {
-        if(this.GetType() == typeof(PlayerCharacter)){
-            isPlayer = true;
-        }else{
-            isPlayer = false;
-        }
+
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody>();
         capsule = GetComponent<CapsuleCollider>();
-        defaultCapsuleHeight = capsule.height;
-        defaultCapsuleCenter = capsule.center;
         rigid.drag = 5;
         rigid.mass = 30;
 
@@ -100,20 +83,19 @@ public abstract class Character : MonoBehaviour , IDamageable {
     }
 
     void OnDestroy() {
-        DestroyInventory();
+        ClearInventory();
     }
 
     protected virtual void Update()
     {
-        if (!isDead && canControl)
-        {
-            UpdateControl();
-        }
+       if (!isDead)
+       {
+           UpdateControl();
+       }
 
-
-        UpdateStatus();
-        UpdateMovement();
-        UpdateAnimator();
+       UpdateStatus();
+       UpdateMovement();
+       UpdateAnimator();
     }
 
     protected virtual void FixedUpdate() {
@@ -132,12 +114,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     protected virtual void UpdateMovement()
     {
-        //transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
-        //velocity = transform.forward * forwardAmount * speed;
-
         velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
-
-        if (isCrouching) velocity *= 0.5f;
         velocity.y = rigid.velocity.y;
     }
 
@@ -153,71 +130,20 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     #endregion
 
-    #region Public
-
-    public virtual void Melee() {
-
-        if (currentWeapon as MeleeWeapon == null) return; 
-
-        anim.SetTrigger("Melee");
+    #region Die
+    public virtual void Die() {
+        if (isDead) return;
+        isDead = true;
+        Movement(Vector3.zero);
+        anim.Play("Die");
+        capsule.height = 0.1f;
+        capsule.center = new Vector3(0, 0.3f, 0);
     }
 
-    public virtual void SetActiveMelee(bool active) {
-        if (currentWeapon as MeleeWeapon == null) return;
+    #endregion
 
-        (currentWeapon as MeleeWeapon).SetActiveDamage(active);
-    }
-
-
-    public virtual bool Fire(bool continuously) {
-        var weapon = (currentWeapon as ShootWeapon);
-
-        if (weapon == null)
-            return false;
-
-        bool successful;
-
-        if (continuously)
-            successful = weapon.OnAttackContinuously();
-        else
-            successful = weapon.OnAttackOnce();
-
-        if (successful) {
-            anim.SetTrigger("Fire");
-        }
-
-        return successful;
-    }
-
-    public void EquipNextWeapon() {
-        if(inventory.Count >= 2) {
-            var currentIndex = inventory.IndexOf(currentWeapon);
-            var nextIndex = (currentIndex + 1) % inventory.Count;
-            var nextWeapon = inventory[nextIndex];
-            EquipWeapon(nextWeapon);
-        }
-    }
-
-    public void EquipPrevWeapon() {
-        if (inventory.Count >= 2) {
-            var currentIndex = inventory.IndexOf(currentWeapon);
-            var prevIndex = (currentIndex - 1 + inventory.Count) % inventory.Count;
-            var prevWeapon = inventory[prevIndex];
-            EquipWeapon(prevWeapon);
-        }
-    }
-
-    public virtual void EquipWeapon(Weapon newWeapon) {
-        if (!newWeapon) return;
-        SetCurrentWeapon(newWeapon, currentWeapon);
-    }
-
-    public virtual void UnEquipWeapon(Weapon newWeapon) {
-        if (newWeapon && newWeapon == currentWeapon) {
-            SetCurrentWeapon(null, newWeapon);
-        }
-    }
-
+    #region Locomotion
+    
     public virtual void Movement(Vector3 move) {
 
         //当模大于1时，要进行归一化，防止在斜方向移动时，移动速度加快
@@ -235,50 +161,51 @@ public abstract class Character : MonoBehaviour , IDamageable {
         forwardAmount = move.z;
 
     }
+    #endregion
 
-    public virtual void Die() {
-        if (isDead) return;
-        isDead = true;
-        Movement(Vector3.zero);
-        anim.Play("Die");
-        capsule.height = 0.2f;
-        capsule.center = new Vector3(0, 0.3f, 0);
-        AudioSource.PlayClipAtPoint(dieSound, transform.position);
+    #region Melee
+
+    public virtual void Melee() {
+
+        if (currentWeapon as MeleeWeapon == null) return; 
+
+        anim.SetTrigger("Melee");
+    }
+
+    public virtual void SetActiveMelee(bool active) {
+        if (currentWeapon as MeleeWeapon == null) return;
+
+        (currentWeapon as MeleeWeapon).SetActiveDamage(active);
     }
 
     #endregion
 
-    #region Interface
+    #region Shoot
+    
+    public virtual bool Shoot(bool continuously) {
+        var weapon = (currentWeapon as ShootWeapon);
 
-    public virtual void TakeDamage(DamageEventData damageData) {
-        if (damageData == null) return;
+        if (weapon == null)
+            return false;
 
-        if (health > Mathf.Abs(damageData.delta) || damageData.delta > 0) {
-            health += damageData.delta;
-            anim.Play("Hit");
-        } else {
-            if (!isDead) Die();
+        bool successful;
+
+        if (continuously)
+            successful = weapon.OnAttackContinuously();
+        else
+            successful = weapon.OnAttackOnce();
+
+        if (successful) {
+            anim.SetTrigger("Shoot");
         }
-    }
 
+        return successful;
+    }
+    
     #endregion
 
-    #region Private
-
-    void CheckGround() {
-        RaycastHit hitInfo;
-
-        Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * groundCheckDistance));
-
-        if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, groundCheckDistance)) {
-            groundNormal = hitInfo.normal;
-            isGrounded = true;
-        } else {
-            isGrounded = false;
-            groundNormal = Vector3.up;
-        }
-    }
-
+    #region Inventory
+    
     void AddWeaponToInventory(Weapon weapon) {
 
         if (!weapon) return;
@@ -303,7 +230,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     }
 
-    void DestroyInventory() {
+    void ClearInventory() {
         for (int i=0; i < inventory.Count; i++) {
             var item = inventory[i];
             if (!item) continue;
@@ -335,6 +262,39 @@ public abstract class Character : MonoBehaviour , IDamageable {
     }
 
 
+    #endregion
+
+    #region Weapon
+
+    public void EquipNextWeapon() {
+        if(inventory.Count >= 2) {
+            var currentIndex = inventory.IndexOf(currentWeapon);
+            var nextIndex = (currentIndex + 1) % inventory.Count;
+            var nextWeapon = inventory[nextIndex];
+            EquipWeapon(nextWeapon);
+        }
+    }
+
+    public void EquipPrevWeapon() {
+        if (inventory.Count >= 2) {
+            var currentIndex = inventory.IndexOf(currentWeapon);
+            var prevIndex = (currentIndex - 1 + inventory.Count) % inventory.Count;
+            var prevWeapon = inventory[prevIndex];
+            EquipWeapon(prevWeapon);
+        }
+    }
+
+    public virtual void EquipWeapon(Weapon newWeapon) {
+        if (!newWeapon) return;
+        SetCurrentWeapon(newWeapon, currentWeapon);
+    }
+
+    public virtual void UnEquipWeapon(Weapon newWeapon) {
+        if (newWeapon && newWeapon == currentWeapon) {
+            SetCurrentWeapon(null, newWeapon);
+        }
+    }
+
     void SetCurrentWeapon(Weapon newWeapon, Weapon lastWeapon) {
         Weapon LocalLastWeapon = null;
 
@@ -354,6 +314,39 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
         if (newWeapon) newWeapon.OnEquip();
 
+    }
+
+    #endregion
+
+    #region Damage
+
+    public virtual void TakeDamage(DamageEventData damageData) {
+        if (damageData == null) return;
+
+        if (health > Mathf.Abs(damageData.delta) || damageData.delta > 0) {
+            health += damageData.delta;
+            anim.Play("Hit");
+        } else {
+            if (!isDead) Die();
+        }
+    }
+
+    #endregion
+
+    #region Status
+    
+    void CheckGround() {
+        RaycastHit hitInfo;
+
+        Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * groundCheckDistance));
+
+        if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, groundCheckDistance)) {
+            groundNormal = hitInfo.normal;
+            isGrounded = true;
+        } else {
+            isGrounded = false;
+            groundNormal = Vector3.up;
+        }
     }
 
     void HealthRecovery()
@@ -418,47 +411,27 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     #region Animation
 
-    public int baseLayer { get { return anim.GetLayerIndex("Base Layer"); } }
-    public int underBodyLayer { get { return anim.GetLayerIndex("Under Body"); } }
-    public int rightArmLayer { get { return anim.GetLayerIndex("Right Arm"); } }
-    public int leftArmLayer { get { return anim.GetLayerIndex("Left Arm"); } }
-    public int upperBodyLayer { get { return anim.GetLayerIndex("Upper Body"); } }
-    public int fullbodyLayer { get { return anim.GetLayerIndex("Full Body"); } }
-
-    public virtual void RefreshAnimatorState()
-    {
-        if (anim == null || !anim.enabled) return;
-        baseLayerInfo = anim.GetCurrentAnimatorStateInfo(baseLayer);
-        underBodyInfo = anim.GetCurrentAnimatorStateInfo(underBodyLayer);
-        rightArmInfo = anim.GetCurrentAnimatorStateInfo(rightArmLayer);
-        leftArmInfo = anim.GetCurrentAnimatorStateInfo(leftArmLayer);
-        upperBodyInfo = anim.GetCurrentAnimatorStateInfo(upperBodyLayer);
-        fullBodyInfo = anim.GetCurrentAnimatorStateInfo(fullbodyLayer);
-    }
-    
     public bool InAnimatorStateWithTag(string tag)
     {
         if (anim == null) return false;
-        RefreshAnimatorState();
-        if (baseLayerInfo.IsTag(tag)) return true;
-        if (underBodyInfo.IsTag(tag)) return true;
-        if (rightArmInfo.IsTag(tag)) return true;
-        if (leftArmInfo.IsTag(tag)) return true;
-        if (upperBodyInfo.IsTag(tag)) return true;
-        if (fullBodyInfo.IsTag(tag)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(baseLayer).IsTag(tag)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(underBodyLayer).IsTag(tag)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(rightArmLayer).IsTag(tag)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(leftArmLayer).IsTag(tag)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(upperBodyLayer).IsTag(tag)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(fullbodyLayer).IsTag(tag)) return true;
         return false;
     }
 
     public bool InAnimatorStateWithName(string name)
     {
-        RefreshAnimatorState();
         if (anim == null) return false;
-        if (baseLayerInfo.IsName(name)) return true;
-        if (underBodyInfo.IsName(name)) return true;
-        if (rightArmInfo.IsName(name)) return true;
-        if (leftArmInfo.IsName(name)) return true;
-        if (upperBodyInfo.IsName(name)) return true;
-        if (fullBodyInfo.IsName(name)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(baseLayer).IsName(name)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(underBodyLayer).IsName(name)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(rightArmLayer).IsName(name)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(leftArmLayer).IsName(name)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(upperBodyLayer).IsName(name)) return true;
+        if (anim.GetCurrentAnimatorStateInfo(fullbodyLayer).IsName(name)) return true;
         return false;
     }
 

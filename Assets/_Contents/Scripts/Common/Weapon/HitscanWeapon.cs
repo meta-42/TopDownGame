@@ -25,7 +25,6 @@ public class HitscanWeapon : ShootWeapon
     [SerializeField]
     private GameObject tracer;
 
-
     [SerializeField]
     [Range(0f, 30f)]
     private float spreadAim = 0.95f;

@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class MeleeWeapon : Weapon {
 
-    [Tooltip("配置此武器的所有HitBox")]
     public List<HitBox> hitBoxes;
+    public bool debugVisual;
 
     private Dictionary<HitBox, List<GameObject>> hitObjctCache;
-
     private bool canApplyDamage;
 
-    public bool debugVisual;
 
     protected virtual void Start() {
         hitObjctCache = new Dictionary<HitBox, List<GameObject>>();

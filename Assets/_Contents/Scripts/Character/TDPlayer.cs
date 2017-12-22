@@ -1,22 +1,14 @@
-using UnityEngine;
-using UnityEngine.Events;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-
-public class PlayerCharacter : Character
-{
+public class TDPlayer : PlayerCharacter {
     protected override void Start() {
         base.Start();
         Cursor.visible = false;
-        rigid.constraints = RigidbodyConstraints.None | 
-            RigidbodyConstraints.FreezeRotationX |
-            RigidbodyConstraints.FreezeRotationY |
-            RigidbodyConstraints.FreezeRotationZ;
-
     }
 
-    protected override void UpdateControl() {
+	protected override void UpdateControl() {
         base.UpdateControl();
 
         float h = Input.GetAxis("Horizontal");
@@ -66,16 +58,4 @@ public class PlayerCharacter : Character
         aimPos.y = transform.position.y;
         transform.LookAt(aimPos);
     }
-
-    public override void Die()
-    {
-        base.Die();
-        StartCoroutine(OnRestartLevel());
-    }
-
-    IEnumerator OnRestartLevel() {
-        yield return new WaitForSeconds(3);
-        GameController.Instance.ReloadScene();
-    }
 }
-

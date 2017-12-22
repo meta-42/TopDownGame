@@ -48,7 +48,7 @@ public abstract class Character : MonoBehaviour , IDamageable {
     #region Property
     public bool isPlayer {
         get{
-            if(this.GetType() == typeof(PlayerCharacter)){
+            if(this.GetType().IsSubclassOf(typeof(PlayerCharacter))){
                 return true;
             }else{
                 return false;
@@ -114,6 +114,9 @@ public abstract class Character : MonoBehaviour , IDamageable {
 
     protected virtual void UpdateMovement()
     {
+        //转向控制
+        transform.Rotate(0, turnAmount * angularSpeed * Time.deltaTime, 0);
+
         velocity = (transform.forward * forwardAmount + transform.right * rightAmount) * speed;
         velocity.y = rigid.velocity.y;
     }
@@ -125,7 +128,6 @@ public abstract class Character : MonoBehaviour , IDamageable {
         anim.SetFloat("Speed", velocity.magnitude, 0.01f, Time.deltaTime);
         anim.SetBool("OnGround", isGrounded);
         anim.SetBool("Aiming",(currentWeapon as ShootWeapon) != null);
-
     }
 
     #endregion

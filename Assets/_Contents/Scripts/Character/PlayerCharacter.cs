@@ -6,14 +6,9 @@ using System.Collections.Generic;
 
 public class PlayerCharacter : Character
 {
-    public GameObject defaultAimTarget;
-    GameObject aimTarget;
-    Transform aimTargetPos;
-
     protected override void Start() {
         base.Start();
-
-        SpawnDefaultAimTarget();
+        Cursor.visible = false;
         rigid.constraints = RigidbodyConstraints.None | 
             RigidbodyConstraints.FreezeRotationX |
             RigidbodyConstraints.FreezeRotationY |
@@ -23,8 +18,6 @@ public class PlayerCharacter : Character
 
     protected override void UpdateControl() {
         base.UpdateControl();
-
-        UpdateAimTarget();
 
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
@@ -47,15 +40,14 @@ public class PlayerCharacter : Character
         }
 
         if(!InAnimatorStateWithTag("Attack")){
-            if (Input.GetAxis("Mouse ScrollWheel") < -0.1) {
+            if (Input.GetKeyUp(KeyCode.Q)) {
                 EquipPrevWeapon();
             }
 
-            if (Input.GetAxis("Mouse ScrollWheel") > 0.1) {
+            if (Input.GetKeyUp(KeyCode.E)) {
                 EquipNextWeapon();
             }
         }
-
 
         if (Input.GetKeyDown(KeyCode.Tab)) {
             if (InventoryPanel.Get() != null && !InventoryPanel.Get().gameObject.activeSelf) {
@@ -70,35 +62,15 @@ public class PlayerCharacter : Character
 
     protected override void UpdateMovement() {
         base.UpdateMovement();
-        transform.LookAt(aimTarget.transform.position, Vector3.up);
+        var aimPos  = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y,10));
+        aimPos.y = transform.position.y;
+        transform.LookAt(aimPos);
     }
 
     public override void Die()
     {
         base.Die();
         StartCoroutine(OnRestartLevel());
-    }
-
-    void SpawnDefaultAimTarget() {
-        if (defaultAimTarget) {
-            Cursor.visible = false;
-            aimTarget = Instantiate(defaultAimTarget);
-            aimTargetPos = aimTarget.transform.Find("AimPos");
-        }
-    }
-
-    void UpdateAimTarget() {
-        aimTarget.SetActive(true);
-        if (!aimTarget) return;
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 2000f, 9)) {
-            Vector3 FinalPos = new Vector3(hit.point.x, 0, hit.point.z);
-
-            aimTarget.transform.position = FinalPos;
-            aimTarget.transform.LookAt(transform.position);
-        }
     }
 
     IEnumerator OnRestartLevel() {
